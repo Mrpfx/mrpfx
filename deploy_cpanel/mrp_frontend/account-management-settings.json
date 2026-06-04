@@ -1,0 +1,48 @@
+{
+    "minCapital": 1000,
+    "placeholder": "Capital Amount (Min $1000)",
+    "tiers": [
+        {
+            "min": 1000,
+            "max": 2999,
+            "fee": 250,
+            "target": 500,
+            "slug": "acc-mgmt-1k-2k"
+        },
+        {
+            "min": 3000,
+            "max": 4999,
+            "fee": 750,
+            "target": 1500,
+            "slug": "acc-mgmt-3k-4k"
+        },
+        {
+            "min": 5000,
+            "max": 6999,
+            "fee": 1250,
+            "target": 2500,
+            "slug": "acc-mgmt-5k-6k"
+        },
+        {
+            "min": 7000,
+            "max": 8999,
+            "fee": 1750,
+            "target": 3500,
+            "slug": "acc-mgmt-7k-8k"
+        },
+        {
+            "min": 9000,
+            "max": 10999,
+            "fee": 2250,
+            "target": 4500,
+            "slug": "acc-mgmt-9k-10k"
+        },
+        {
+            "min": 11000,
+            "max": 99999999,
+            "fee": 2750,
+            "target": 5500,
+            "slug": "acc-mgmt-11k-plus"
+        }
+    ]
+}

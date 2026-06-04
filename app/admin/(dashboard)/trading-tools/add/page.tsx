@@ -29,6 +29,8 @@ export default function AddTradingToolPage() {
         status: 'publish',
         price: '0',
         image_url: '',
+        seller_payment_link: '',
+        whop_payment_link: '',
     });
 
     const handleChange = (field: keyof DynamicTradingToolCreate, value: any) => {
@@ -49,6 +51,7 @@ export default function AddTradingToolPage() {
         try {
             const submitData = {
                 ...formData,
+                price: formData.price === '' ? '0' : formData.price,
                 image_url: featuredImage
                     ? relativizeMediaUrl((featuredImage as any).url || featuredImage.source_url)
                     : relativizeMediaUrl(formData.image_url)
@@ -180,13 +183,35 @@ export default function AddTradingToolPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-400">Purchase URL (Whop/Checkout link)</label>
+                                <label className="text-sm font-medium text-gray-400">Purchase URL (Native/Direct link)</label>
                                 <input
                                     type="url"
                                     className="w-full bg-gray-800 text-white text-sm rounded-lg px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 border border-transparent placeholder-gray-600"
                                     placeholder="https://..."
                                     value={formData.purchase_url}
                                     onChange={(e) => handleChange('purchase_url', e.target.value)}
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-400">Selar Payment Link (Optional)</label>
+                                <input
+                                    type="url"
+                                    className="w-full bg-gray-800 text-white text-sm rounded-lg px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 border border-transparent placeholder-gray-600"
+                                    placeholder="https://selar.co/..."
+                                    value={formData.seller_payment_link}
+                                    onChange={(e) => handleChange('seller_payment_link', e.target.value)}
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-400">Whop Payment Link (Optional)</label>
+                                <input
+                                    type="url"
+                                    className="w-full bg-gray-800 text-white text-sm rounded-lg px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 border border-transparent placeholder-gray-600"
+                                    placeholder="https://whop.com/..."
+                                    value={formData.whop_payment_link}
+                                    onChange={(e) => handleChange('whop_payment_link', e.target.value)}
                                 />
                             </div>
 

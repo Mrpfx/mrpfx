@@ -1,13 +1,13 @@
 import api from './api';
-import { Signal, TradingVideo } from './types';
+import { Signal, TradingVideo, SignalPagination } from './types';
 
 export const signalsService = {
     /**
      * Get recent signals
      */
-    getSignals: async (type: 'vip' | 'free', limit: number = 10): Promise<Signal[]> => {
+    getSignals: async (type: 'vip' | 'free', limit: number = 10): Promise<SignalPagination> => {
         try {
-            const response = await api.get<Signal[]>('/signals', { params: { type, limit } });
+            const response = await api.get<SignalPagination>('/signals', { params: { type, limit } });
             return response.data;
         } catch (error) {
             console.warn(`Failed to fetch signals for type ${type}:`, error);

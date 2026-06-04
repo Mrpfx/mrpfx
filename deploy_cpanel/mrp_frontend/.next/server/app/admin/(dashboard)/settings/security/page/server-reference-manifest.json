@@ -1,0 +1,50 @@
+{
+  "node": {
+    "00913f5982e0644852ab617d1d68b1a085b6a6dc4d": {
+      "workers": {
+        "app/admin/(dashboard)/settings/security/page": {
+          "moduleId": 12027,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/security/page": "action-browser"
+      },
+      "exportedName": "getPromoBannerSettings",
+      "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+    },
+    "007fe384f1ff8a56148a10627cc1043100097c9a4b": {
+      "workers": {
+        "app/admin/(dashboard)/settings/security/page": {
+          "moduleId": 12027,
+          "async": false,
+          "exportedName": "getSecuritySettings",
+          "filename": "mrp_frontend/app/actions/security-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/security/page": "action-browser"
+      },
+      "exportedName": "getSecuritySettings",
+      "filename": "mrp_frontend/app/actions/security-settings.ts"
+    },
+    "40427bcfbd6df6fa3c0b1acf019c633f4823b62e22": {
+      "workers": {
+        "app/admin/(dashboard)/settings/security/page": {
+          "moduleId": 12027,
+          "async": false,
+          "exportedName": "updateSecuritySettings",
+          "filename": "mrp_frontend/app/actions/security-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/security/page": "action-browser"
+      },
+      "exportedName": "updateSecuritySettings",
+      "filename": "mrp_frontend/app/actions/security-settings.ts"
+    }
+  },
+  "edge": {}
+}

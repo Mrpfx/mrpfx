@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { authService, User } from '@/lib/auth';
 import PromoBanner from './PromoBanner';
+import { ChevronDown, Menu, X, User as UserIcon, LogOut, LayoutDashboard } from 'lucide-react';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,7 +22,6 @@ const Header = () => {
             setUser(userData);
           } catch (error: any) {
             console.error('Failed to fetch user:', error);
-            // If user is not verified (403), try to get user from token
             if (error.response && error.response.status === 403) {
               const tokenUser = authService.getUserFromToken();
               if (tokenUser) {
@@ -41,16 +41,9 @@ const Header = () => {
     };
 
     fetchUser();
-
-    const handleAuthChange = () => {
-      fetchUser();
-    };
-
+    const handleAuthChange = () => fetchUser();
     window.addEventListener('auth-change', handleAuthChange);
-
-    return () => {
-      window.removeEventListener('auth-change', handleAuthChange);
-    };
+    return () => window.removeEventListener('auth-change', handleAuthChange);
   }, []);
 
   const handleLogout = () => {
@@ -70,139 +63,101 @@ const Header = () => {
   const closeMenu = () => {
     setIsMenuOpen(false);
     setMobileSubMenu(null);
+    setOpenDropdown(null);
   };
+
+  const menuCategories = [
+    {
+      id: 'signals',
+      label: 'Signals',
+      items: [
+        { label: 'VIP Signals', href: '/vip-signals-group' },
+        { label: 'Free Signals', href: 'https://t.me/mrpfxuniversity', isExternal: true },
+      ]
+    },
+    {
+      id: 'automation',
+      label: 'Automation',
+      items: [
+        { label: 'Copy Trading', href: '/copy-trading' },
+        { label: 'Account Management', href: '/account-management' },
+        { label: 'Pass Funded Accounts', href: '/pass-funded-accounts' },
+      ]
+    },
+    {
+      id: 'bots-indicators',
+      label: 'Bots & Indicators',
+      items: [
+        { label: 'VIP Bots', href: '/vip-trading-bots' },
+        { label: 'VIP Indicators', href: '/vip-trading-indicators' },
+        { label: 'Free Bots', href: '/free-robots' },
+        { label: 'Free Indicators', href: '/free-trading-indicators' },
+      ]
+    },
+    {
+      id: 'education-tools',
+      label: 'Education & Tools',
+      items: [
+        { label: 'Mentorship Course', href: '/mentorship-course' },
+        { label: 'Forex Books', href: '/forex-books' },
+        { label: 'Trade Journal', href: '/' },
+        { label: 'Risk Calculator', href: '/risk-calculator' },
+      ]
+    },
+    {
+      id: 'partners',
+      label: 'Partners',
+      items: [
+        { label: 'Recommended Broker', href: 'https://one.exnessonelink.com/a/0z72b5esoc', isExternal: true },
+        { label: 'Dr. Trade AI', href: 'https://www.drtradepro.com', isExternal: true },
+      ]
+    }
+  ];
 
   return (
     <header id="masthead" className="sticky top-0 z-[9999] bg-white w-full shadow-sm">
       <PromoBanner />
+
       {/* Desktop Header */}
-      <div className="hidden lg:flex items-center justify-between px-5 py-3 max-w-full mx-auto border-b border-gray-100">
+      <div className="hidden lg:flex items-center justify-between px-6 py-3 max-w-full mx-auto border-b border-gray-100">
         {/* Logo */}
         <div className="flex-shrink-0">
           <Link href="/">
-            <img
-              alt="Mr P FX"
-              src="/assets/images/mrpfxlogo.png"
-              width={52}
-              height={52}
-              className="h-[52px] w-auto"
-            />
+            <img alt="Mr P FX" src="/assets/images/mrpfxlogo.png" width={52} height={52} className="h-[52px] w-auto" />
           </Link>
         </div>
 
         {/* Navigation Menu */}
         <nav aria-label="Menu" className="flex-1 flex justify-center">
-          <ul className="flex items-center justify-center gap-0.5 list-none m-0 p-0">
-            <li className="relative">
-              <Link
-                href="/mentorship-course"
-                className="inline-block px-3 py-2.5 font-dm-sans text-xs font-bold text-gray-900 uppercase tracking-wide rounded-md hover:bg-gray-100 transition-colors whitespace-nowrap"
+          <ul className="flex items-center justify-center gap-1 list-none m-0 p-0">
+            {menuCategories.map((cat) => (
+              <li
+                key={cat.id}
+                className="relative group"
+                onMouseEnter={() => setOpenDropdown(cat.id)}
+                onMouseLeave={() => setOpenDropdown(null)}
               >
-                Mentorship Courses
-              </Link>
-            </li>
-            <li className="relative">
-              <Link
-                href="/vip-signals-group"
-                className="inline-block px-3 py-2.5 font-dm-sans text-xs font-bold text-gray-900 uppercase tracking-wide rounded-md hover:bg-gray-100 transition-colors whitespace-nowrap"
-              >
-                VIP Signals Group
-              </Link>
-            </li>
-            <li
-              className="relative group"
-              onMouseEnter={() => setOpenDropdown('vip-bots')}
-              onMouseLeave={() => setOpenDropdown(null)}
-            >
-              <Link
-                href="/all-vip-resources"
-                className="inline-block px-3 py-2.5 font-dm-sans text-xs font-bold text-gray-900 uppercase tracking-wide rounded-md hover:bg-gray-100 transition-colors whitespace-nowrap"
-              >
-                VIP BOTS/INDICATORS <span className="text-[8px] ml-1 align-middle">▼</span>
-              </Link>
-              {/* Dropdown */}
-              <ul className={`absolute top-full left-0 mt-1 min-w-[220px] bg-white z-[99999] rounded-xl shadow-lg p-2 transition-all duration-200 ${openDropdown === 'vip-bots' ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-1'}`} style={{ backgroundColor: 'white' }}>
-                <li>
-                  <Link
-                    href="/resource_category/robot"
-                    className="block px-4 py-3 font-dm-sans text-sm font-semibold text-gray-700 uppercase tracking-wide rounded-lg hover:bg-gray-100 hover:text-black transition-all"
-                  >
-                    BOTS
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/resource_category/indicator"
-                    className="block px-4 py-3 font-dm-sans text-sm font-semibold text-gray-700 uppercase tracking-wide rounded-lg hover:bg-gray-100 hover:text-black transition-all"
-                  >
-                    INDICATORS
-                  </Link>
-                </li>
-              </ul>
-            </li>
-            <li className="relative">
-              <Link
-                href="/all-vip-resources"
-                className="inline-block px-3 py-2.5 font-dm-sans text-xs font-bold text-gray-900 uppercase tracking-wide rounded-md hover:bg-gray-100 transition-colors whitespace-nowrap"
-              >
-                All VIP Resources
-              </Link>
-            </li>
-            <li
-              className="relative group"
-              onMouseEnter={() => setOpenDropdown('free-resources')}
-              onMouseLeave={() => setOpenDropdown(null)}
-            >
-              <Link
-                href="/resource_category/free-robots-indicators-seminars"
-                className="inline-block px-3 py-2.5 font-dm-sans text-xs font-bold text-gray-900 uppercase tracking-wide rounded-md hover:bg-gray-100 transition-colors whitespace-nowrap"
-              >
-                ALL FREE RESOURCES <span className="text-[8px] ml-1 align-middle">▼</span>
-              </Link>
-              {/* Dropdown */}
-              <ul className={`absolute top-full left-0 mt-1 min-w-[220px] bg-white rounded-xl shadow-lg p-2 transition-all duration-200 z-[99999] ${openDropdown === 'free-resources' ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-1'}`} style={{ backgroundColor: 'white' }}>
-                <li>
-                  <Link
-                    href="/resource_category/indicator"
-                    className="block px-4 py-3 font-dm-sans text-sm font-semibold text-gray-700 uppercase tracking-wide rounded-lg hover:bg-gray-100 hover:text-black transition-all"
-                  >
-                    FREE INDICATORS
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/resource_category/robot"
-                    className="block px-4 py-3 font-dm-sans text-sm font-semibold text-gray-700 uppercase tracking-wide rounded-lg hover:bg-gray-100 hover:text-black transition-all"
-                  >
-                    FREE BOTS
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/mentorship-course"
-                    className="block px-4 py-3 font-dm-sans text-sm font-semibold text-gray-700 uppercase tracking-wide rounded-lg hover:bg-gray-100 hover:text-black transition-all"
-                  >
-                    FREE MENTORSHIP VIDEOS
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/resource_category/free-robots-indicators-seminars"
-                    className="block px-4 py-3 font-dm-sans text-sm font-semibold text-gray-700 uppercase tracking-wide rounded-lg hover:bg-gray-100 hover:text-black transition-all"
-                  >
-                    ALL RESOURCES
-                  </Link>
-                </li>
-              </ul>
-            </li>
-            <li className="relative">
-              <Link
-                href="/support"
-                className="inline-block px-3 py-2.5 font-dm-sans text-xs font-bold text-gray-900 uppercase tracking-wide rounded-md hover:bg-gray-100 transition-colors whitespace-nowrap"
-              >
-                Support
-              </Link>
-            </li>
+                <button className="flex items-center gap-1 px-3 py-2.5 font-dm-sans text-[11px] font-bold text-gray-900 uppercase tracking-wider rounded-md hover:bg-gray-50 transition-colors whitespace-nowrap">
+                  {cat.label}
+                  <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${openDropdown === cat.id ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Dropdown */}
+                <div className={`absolute top-full left-0 mt-1 min-w-[220px] bg-white z-[99999] rounded-xl shadow-xl border border-gray-100 p-2 transition-all duration-200 ${openDropdown === cat.id ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2'}`}>
+                  {cat.items.map((item, idx) => (
+                    <Link
+                      key={idx}
+                      href={item.href}
+                      target={item.isExternal ? "_blank" : undefined}
+                      className="block px-4 py-2.5 font-dm-sans text-sm font-semibold text-gray-700 hover:bg-[#5B2EFF] hover:text-white rounded-lg transition-all"
+                      onClick={() => setOpenDropdown(null)}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </li>
+            ))}
           </ul>
         </nav>
 
@@ -210,228 +165,111 @@ const Header = () => {
         <div className="flex items-center gap-3 flex-shrink-0">
           {user ? (
             <div
-              className="relative group"
+              className="relative"
               onMouseEnter={() => setOpenDropdown('user-menu')}
               onMouseLeave={() => setOpenDropdown(null)}
             >
-              <button className="flex items-center gap-2 px-4 py-2 border border-[#2A3596] rounded-lg bg-white text-[#2A3596] font-bold text-sm hover:bg-gray-50 transition-colors">
-                <div className="flex flex-col items-start text-xs leading-tight">
-                  <span className="font-bold">Hello,</span>
-                  <span className="font-medium truncate max-w-[150px]">{user.user_email}</span>
+              <button className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg bg-white text-gray-700 font-bold text-sm hover:border-[#5B2EFF] transition-all">
+                <div className="w-8 h-8 rounded-full bg-[#5B2EFF] text-white flex items-center justify-center text-xs">
+                  {user.user_email?.charAt(0).toUpperCase()}
                 </div>
-                <span className="text-[10px]">▼</span>
+                <span className="max-w-[120px] truncate text-xs">{user.user_email}</span>
+                <ChevronDown className="w-3 h-3" />
               </button>
 
-              {/* User Dropdown */}
-              <ul className={`absolute top-full right-0 mt-1 min-w-[200px] bg-white rounded-xl shadow-lg p-2 transition-all duration-200 z-[99999] ${openDropdown === 'user-menu' ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-1'}`} style={{ backgroundColor: 'white' }}>
-                <li>
-                  <Link
-                    href="/dashboard"
-                    className="block px-4 py-3 font-dm-sans text-sm font-bold text-gray-800 hover:bg-gray-100 rounded-lg transition-all"
-                  >
-                    My Courses & Materials
-                  </Link>
-                </li>
-                <li className="border-t border-gray-100 my-1"></li>
-                <li>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-3 font-dm-sans text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                  >
-                    Logout
-                  </button>
-                </li>
-              </ul>
+              <div className={`absolute top-full right-0 mt-1 min-w-[220px] bg-white rounded-xl shadow-xl border border-gray-100 p-2 transition-all duration-200 z-[99999] ${openDropdown === 'user-menu' ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2'}`}>
+                <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 font-dm-sans text-sm font-bold text-gray-700 hover:bg-gray-50 rounded-lg transition-all">
+                  <LayoutDashboard className="w-4 h-4 text-[#5B2EFF]" />
+                  My Dashboard
+                </Link>
+                <div className="border-t border-gray-50 my-1"></div>
+                <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 font-dm-sans text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-all">
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
+              </div>
             </div>
           ) : (
             <>
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center bg-white border-[1.5px] border-[#5B2EFF] text-[#5B2EFF] font-dm-sans text-sm font-bold px-6 py-2.5 rounded-lg hover:bg-[#f8f7ff] transition-all whitespace-nowrap"
-              >
-                Login
-              </Link>
-              <Link
-                href="/sign-up"
-                className="inline-flex items-center justify-center bg-[#5B2EFF] border-[1.5px] border-[#5B2EFF] text-white font-dm-sans text-sm font-bold px-6 py-2.5 rounded-lg hover:bg-[#4920cc] transition-all whitespace-nowrap"
-              >
-                Sign Up
-              </Link>
+              <Link href="/login" className="px-5 py-2.5 font-dm-sans text-sm font-bold text-[#5B2EFF] hover:bg-gray-50 transition-all">Log In</Link>
+              <Link href="/sign-up" className="bg-[#5B2EFF] text-white px-6 py-2.5 rounded-lg font-dm-sans text-sm font-bold hover:bg-[#4920cc] transition-all shadow-md shadow-blue-500/20">Sign Up</Link>
             </>
           )}
         </div>
       </div>
 
       {/* Mobile Header */}
-      <div className="lg:hidden flex flex-col bg-white">
-        {/* Logo and Menu Toggle */}
-        <div className="flex justify-between items-center w-full p-4 relative z-50">
-          <Link href="/">
-            <img
-              alt="Mr P FX"
-              src="/assets/images/mrpfxlogo.png"
-              width={52}
-              height={52}
-              className="h-[52px] w-auto"
-            />
-          </Link>
+      <div className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-gray-100 relative z-[9999]">
+        <Link href="/">
+          <img alt="Mr P FX" src="/assets/images/mrpfxlogo.png" width={44} height={44} className="h-11 w-auto" />
+        </Link>
 
-          <div className="flex items-center gap-3">
-            {/* Profile Icon for logged-in users */}
-            {user && (
-              <Link
-                href="/dashboard"
-                className="flex items-center justify-center w-9 h-9 rounded-full bg-[#2A3596] text-white font-bold text-sm uppercase shadow-md hover:bg-[#1a237e] transition-colors flex-shrink-0"
-                aria-label="Go to Dashboard"
-              >
-                {user.user_email?.charAt(0) || 'U'}
-              </Link>
-            )}
+        <div className="flex items-center gap-4">
+          {user && (
+            <Link href="/dashboard" className="w-9 h-9 rounded-full bg-[#5B2EFF] text-white flex items-center justify-center font-bold shadow-md">
+              {user.user_email?.charAt(0).toUpperCase()}
+            </Link>
+          )}
+          <button onClick={toggleMenu} className="p-1">
+            {isMenuOpen ? <X className="w-8 h-8 text-black" /> : <Menu className="w-8 h-8 text-black" />}
+          </button>
+        </div>
+      </div>
 
-            <button
-              onClick={toggleMenu}
-              className="p-2 cursor-pointer bg-transparent border-none outline-none"
-              aria-label="Toggle menu"
-              style={{ border: 'none', outline: 'none', boxShadow: 'none', background: 'transparent' }}
-            >
-              {isMenuOpen ? (
-                <svg className="w-8 h-8" fill="none" stroke="black" viewBox="0 0 24 24" style={{ border: 'none', outline: 'none' }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="w-8 h-8" fill="none" stroke="black" viewBox="0 0 24 24" style={{ border: 'none', outline: 'none' }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              )}
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="fixed inset-0 z-[10000] bg-white overflow-y-auto animate-in slide-in-from-right duration-300">
+          {/* Top Bar inside Menu for easy exiting */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-white sticky top-0 z-[10001]">
+            <Link href="/" onClick={closeMenu}>
+              <img alt="Mr P FX" src="/assets/images/mrpfxlogo.png" width={44} height={44} className="h-11 w-auto" />
+            </Link>
+            <button onClick={closeMenu} className="p-1">
+              <X className="w-8 h-8 text-black" />
             </button>
           </div>
-        </div>
 
-        {/* Mobile Menu Dropdown Overlay */}
-        {isMenuOpen && (
-          <nav className="fixed left-0 w-full bg-black z-40 overflow-y-auto animate-fadeIn" style={{
-            top: '84px',
-            height: 'calc(100vh - 84px)',
-            padding: '40px 20px'
-          }}>
-            <ul className="flex flex-col items-center gap-6 list-none p-0 m-0 w-full">
-              <li className="w-full text-center">
-                <Link href="/mentorship-course" onClick={closeMenu} className="text-white font-bold text-lg uppercase tracking-wide hover:text-gray-300 transition-colors block py-2" style={{ color: 'white' }}>
-                  Mentorship Courses
-                </Link>
-              </li>
-              <li className="w-full text-center">
-                <Link href="/vip-signals-group" onClick={closeMenu} className="text-white font-bold text-lg uppercase tracking-wide hover:text-gray-300 transition-colors block py-2" style={{ color: 'white' }}>
-                  VIP Signals Group
-                </Link>
-              </li>
-              <li className="w-full text-center">
+          <div className="px-6 py-6 pb-20">
+            {menuCategories.map((cat) => (
+              <div key={cat.id} className="mb-4">
                 <button
-                  onClick={() => toggleMobileSubMenu('vip-bots')}
-                  className="flex items-center justify-center gap-2 text-white font-bold text-lg uppercase tracking-wide cursor-pointer py-2 w-full bg-transparent border-none"
-                  style={{ color: 'white', border: 'none', outline: 'none', boxShadow: 'none' }}
+                  onClick={() => toggleMobileSubMenu(cat.id)}
+                  className="w-full flex items-center justify-between py-3 text-lg font-bold text-gray-900 border-b border-gray-50"
                 >
-                  VIP BOTS/INDICATORS
-                  <span className="text-sm" style={{ transform: mobileSubMenu === 'vip-bots' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>▼</span>
+                  {cat.label}
+                  <ChevronDown className={`w-5 h-5 transition-transform ${mobileSubMenu === cat.id ? 'rotate-180' : ''}`} />
                 </button>
-                {mobileSubMenu === 'vip-bots' && (
-                  <ul className="mt-2 space-y-2">
-                    <li>
-                      <Link href="/resource_category/robot" onClick={closeMenu} className="text-white font-semibold text-base block py-1" style={{ color: 'white' }}>
-                        BOTS
+                {mobileSubMenu === cat.id && (
+                  <div className="bg-gray-50/50 rounded-xl mt-2 p-2 grid grid-cols-1 gap-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                    {cat.items.map((item, idx) => (
+                      <Link
+                        key={idx}
+                        href={item.href}
+                        target={item.isExternal ? "_blank" : undefined}
+                        onClick={closeMenu}
+                        className="px-4 py-3 text-gray-600 font-semibold text-sm hover:text-[#5B2EFF] transition-colors"
+                      >
+                        {item.label}
                       </Link>
-                    </li>
-                    <li>
-                      <Link href="/resource_category/indicator" onClick={closeMenu} className="text-white font-semibold text-base block py-1" style={{ color: 'white' }}>
-                        INDICATORS
-                      </Link>
-                    </li>
-                  </ul>
+                    ))}
+                  </div>
                 )}
-              </li>
-              <li className="w-full text-center">
-                <Link href="/all-vip-resources" onClick={closeMenu} className="text-white font-bold text-lg uppercase tracking-wide hover:text-gray-300 transition-colors block py-2" style={{ color: 'white' }}>
-                  All VIP Resources
-                </Link>
-              </li>
-              <li className="w-full text-center">
-                <button
-                  onClick={() => toggleMobileSubMenu('free-resources')}
-                  className="flex items-center justify-center gap-2 text-white font-bold text-lg uppercase tracking-wide cursor-pointer py-2 w-full bg-transparent border-none"
-                  style={{ color: 'white', border: 'none', outline: 'none', boxShadow: 'none' }}
-                >
-                  ALL FREE RESOURCES
-                  <span className="text-sm" style={{ transform: mobileSubMenu === 'free-resources' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>▼</span>
-                </button>
-                {mobileSubMenu === 'free-resources' && (
-                  <ul className="mt-2 space-y-2">
-                    <li>
-                      <Link href="/resource_category/indicator" onClick={closeMenu} className="text-white font-semibold text-base block py-1" style={{ color: 'white' }}>
-                        FREE INDICATORS
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/resource_category/robot" onClick={closeMenu} className="text-white font-semibold text-base block py-1" style={{ color: 'white' }}>
-                        FREE BOTS
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/mentorship-course" onClick={closeMenu} className="text-white font-semibold text-base block py-1" style={{ color: 'white' }}>
-                        FREE MENTORSHIP VIDEOS
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/resource_category/free-robots-indicators-seminars" onClick={closeMenu} className="text-white font-semibold text-base block py-1" style={{ color: 'white' }}>
-                        ALL RESOURCES
-                      </Link>
-                    </li>
-                  </ul>
-                )}
-              </li>
-              <li className="w-full text-center mt-4">
-                <Link href="/support" onClick={closeMenu} className="text-white font-bold text-lg uppercase tracking-wide hover:text-gray-300 transition-colors block py-2" style={{ color: 'white' }}>
-                  Support
-                </Link>
-              </li>
+              </div>
+            ))}
 
-              {/* Divider */}
-              <li className="w-full border-t border-gray-800 my-4"></li>
-
-              {/* Auth Actions in Mobile Menu */}
-              {user ? (
+            <div className="mt-8 grid grid-cols-1 gap-4">
+              {!user ? (
                 <>
-                  <li className="w-full text-center mb-2">
-                    <p className="text-gray-400 font-medium text-sm">Hello, {user.user_email}</p>
-                  </li>
-                  <li className="w-full text-center">
-                    <Link href="/dashboard" onClick={closeMenu} className="text-white font-bold text-lg uppercase tracking-wide hover:text-gray-300 transition-colors block py-2">
-                      My Dashboard
-                    </Link>
-                  </li>
-                  <li className="w-full text-center">
-                    <button onClick={() => { handleLogout(); closeMenu(); }} className="text-red-500 font-bold text-lg uppercase tracking-wide hover:text-red-400 transition-colors block py-2 w-full">
-                      Logout
-                    </button>
-                  </li>
+                  <Link href="/login" onClick={closeMenu} className="w-full py-4 text-center font-bold text-gray-900 bg-gray-100 rounded-2xl">Log In</Link>
+                  <Link href="/sign-up" onClick={closeMenu} className="w-full py-4 text-center font-bold text-white bg-[#5B2EFF] rounded-2xl shadow-lg shadow-blue-500/20">Sign Up</Link>
                 </>
               ) : (
-                <>
-                  <li className="w-full text-center">
-                    <Link href="/login" onClick={closeMenu} className="text-white font-bold text-lg uppercase tracking-wide hover:text-gray-300 transition-colors block py-2">
-                      Login
-                    </Link>
-                  </li>
-                  <li className="w-full text-center">
-                    <Link href="/sign-up" onClick={closeMenu} className="text-[#5B2EFF] font-bold text-lg uppercase tracking-wide hover:text-[#4920cc] transition-colors block py-2 mt-2">
-                      Sign Up
-                    </Link>
-                  </li>
-                </>
+                <button onClick={() => { handleLogout(); closeMenu(); }} className="w-full py-4 text-center font-bold text-red-600 bg-red-50 rounded-2xl">Logout</button>
               )}
-            </ul>
-          </nav>
-        )}
-      </div>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

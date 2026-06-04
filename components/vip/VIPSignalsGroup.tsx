@@ -7,14 +7,15 @@ import NewsletterSection from '../shared/NewsletterSection';
 import { Check, X, Lock } from 'lucide-react';
 import { signalsService } from '@/lib/signals';
 import { useDataWithFallback } from '@/lib/hooks/useDataWithFallback';
-import { Signal, TradingVideo, WCProductRead } from '@/lib/types';
+import { Signal, TradingVideo, WCProductRead, SignalPagination } from '@/lib/types';
 import { productsService } from '@/lib/products';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getMediaUrl } from '@/lib/utils';
 import VIPPlanModal from './VIPPlanModal';
 import { getVIPSettings } from '@/app/actions/vip-settings';
 import { useRouter } from 'next/navigation';
 import { cartService } from '@/lib/cart';
+import { useCartAuth } from '@/hooks/useCartAuth';
 import { Loader2 } from 'lucide-react';
 
 
@@ -36,62 +37,73 @@ const FALLBACK_VIDEOS: TradingVideo[] = [
     }
 ];
 
-const FALLBACK_SIGNALS: Signal[] = [
-    {
-        id: 101,
-        title: 'EURUSD BUY Update',
-        date: '2026-03-25',
-        status: 'active',
-        instrument: 'EURUSD',
-        signal_type: 'vip',
-        entry: '1.0850',
-        sl: '1.0790',
-        tp1: '1.0900',
-        type: 'buy'
-    },
-    {
-        id: 102,
-        title: 'EURUSD BUY Update 2',
-        date: '2026-03-25',
-        status: 'active',
-        instrument: 'EURUSD',
-        signal_type: 'vip',
-        entry: '1.0850',
-        sl: '1.0800',
-        tp1: '1.0900',
-        type: 'buy'
-    },
-    {
-        id: 103,
-        title: 'EURUSD BUY Update 3',
-        date: '2026-03-25',
-        status: 'active',
-        instrument: 'EURUSD',
-        signal_type: 'vip',
-        entry: '1.0850',
-        sl: '1.0800',
-        tp1: '1.0900',
-        type: 'buy'
-    }
-];
+const FALLBACK_SIGNALS = {
+    items: [
+        {
+            id: 101,
+            title: 'EURUSD BUY Update',
+            date: '2026-03-25',
+            status: 'active',
+            instrument: 'EURUSD',
+            signal_type: 'vip',
+            entry: '1.0850',
+            sl: '1.0790',
+            tp1: '1.0900',
+            type: 'buy'
+        },
+        {
+            id: 102,
+            title: 'EURUSD BUY Update 2',
+            date: '2026-03-25',
+            status: 'active',
+            instrument: 'EURUSD',
+            signal_type: 'vip',
+            entry: '1.0850',
+            sl: '1.0800',
+            tp1: '1.0900',
+            type: 'buy'
+        },
+        {
+            id: 103,
+            title: 'EURUSD BUY Update 3',
+            date: '2026-03-25',
+            status: 'active',
+            instrument: 'EURUSD',
+            signal_type: 'vip',
+            entry: '1.0850',
+            sl: '1.0800',
+            tp1: '1.0900',
+            type: 'buy'
+        }
+    ],
+    total: 3,
+    page: 1,
+    pageSize: 3
+} as unknown as SignalPagination;
 
 const VIPSignalsGroup = () => {
+    const [isMobile, setIsMobile] = useState(true); // Start as true to use fallback
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768); // md breakpoint
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const { data: youtubeVideos } = useDataWithFallback(
         signalsService.getVideos,
         FALLBACK_VIDEOS,
         3
     );
 
-    const { data: signals } = useDataWithFallback(
-        signalsService.getSignals,
-        FALLBACK_SIGNALS,
-        'vip',
-        3
-    );
+    const signals = FALLBACK_SIGNALS;
 
     const [vipProduct, setVipProduct] = useState<WCProductRead | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [paymentLinks, setPaymentLinks] = useState<{
+    const [planSlugs, setPlanSlugs] = useState<{
         oneMonth: string;
         twelveMonths: string;
         unlimited: string;
@@ -101,6 +113,7 @@ const VIPSignalsGroup = () => {
     const [isLocked, setIsLocked] = useState(false);
     const [unlockDate, setUnlockDate] = useState<string | null>(null);
     const [addingToCart, setAddingToCart] = useState(false);
+    const { isAuthenticated, savePendingAction, getPendingAction, clearPendingAction, redirectToLogin } = useCartAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -115,10 +128,10 @@ const VIPSignalsGroup = () => {
         const fetchVipSettings = async () => {
             try {
                 const settings = await getVIPSettings();
-                setPaymentLinks({
-                    oneMonth: settings.plans.oneMonth.paymentLink,
-                    twelveMonths: settings.plans.twelveMonths.paymentLink,
-                    unlimited: settings.plans.unlimited.paymentLink,
+                setPlanSlugs({
+                    oneMonth: settings.plans.oneMonth.slug,
+                    twelveMonths: settings.plans.twelveMonths.slug,
+                    unlimited: settings.plans.unlimited.slug,
                 });
                 setRegistrationOpenDate(settings.registrationOpenDate);
                 setGroupPageLink(settings.groupPageLink);
@@ -145,6 +158,33 @@ const VIPSignalsGroup = () => {
         fetchVipSettings();
     }, []);
 
+    useEffect(() => {
+        // Execute Pending Cart Action if exists
+        const pendingAction = getPendingAction();
+
+        if (pendingAction && isAuthenticated()) {
+            (async () => {
+                setAddingToCart(true);
+                try {
+                    await cartService.addToCart(
+                        pendingAction.productId,
+                        pendingAction.quantity,
+                        pendingAction.variationId,
+                        pendingAction.customFields
+                    );
+                    window.dispatchEvent(new CustomEvent('open-checkout', {
+                        detail: { method: 'seller' }
+                    }));
+                } catch (e) {
+                    console.error('Failed to execute pending cart action', e);
+                } finally {
+                    setAddingToCart(false);
+                    clearPendingAction();
+                }
+            })();
+        }
+    }, [isAuthenticated]);
+
     const handleAddToCart = async () => {
         // If groupPageLink is an external URL (starts with http), navigate directly
         if (groupPageLink.startsWith('http')) {
@@ -154,21 +194,45 @@ const VIPSignalsGroup = () => {
 
         // Otherwise treat as product slug
         const slug = groupPageLink || 'vip-membership';
+        await handlePlanSelect(slug);
+    };
+
+    const handlePlanSelect = async (slug: string) => {
         setAddingToCart(true);
         try {
             const product = await productsService.getProductBySlug(slug);
+            if (!product) throw new Error('Product not found');
+
+            if (!isAuthenticated()) {
+                savePendingAction({
+                    type: 'ADD_TO_CART',
+                    productId: product.id,
+                    quantity: 1
+                });
+                redirectToLogin();
+                return;
+            }
+
             await cartService.addToCart(product.id, 1);
-            router.push('/checkout');
+            window.dispatchEvent(new CustomEvent('open-checkout', {
+                detail: {
+                    sellerLink: product.seller_payment_link,
+                    method: 'seller'
+                }
+            }));
         } catch (error) {
             console.error('Failed to add VIP to cart:', error);
-            router.push(`/checkout?product=${slug}`);
+            // Fallback to manual checkout with params if needed
+            window.dispatchEvent(new CustomEvent('open-checkout', {
+                detail: { method: 'seller' }
+            }));
         } finally {
             setAddingToCart(false);
         }
     };
 
-    const displayPrice = vipProduct?.price || '39';
-    const regularPrice = vipProduct?.regular_price || '59';
+    const displayPrice = vipProduct?.price || '199';
+    const regularPrice = vipProduct?.regular_price || '199';
     const hasSale = vipProduct?.sale_price && vipProduct.sale_price !== vipProduct.regular_price;
 
     const CheckIcon = () => (
@@ -261,27 +325,14 @@ const VIPSignalsGroup = () => {
                                 </p>
 
                                 <div className="flex flex-col items-start">
-                                    {groupPageLink ? (
-                                        <Link
-                                            href={groupPageLink}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="relative group inline-flex items-center justify-center bg-gradient-to-b from-[#f3e5ab] via-[#d4af37] to-[#b8860b] text-[#1e293b] font-black text-[11px] sm:text-lg md:text-2xl uppercase tracking-tighter px-4 sm:px-10 py-3 sm:py-5 rounded shadow-[0_8px_20px_rgba(184,134,11,0.4)] hover:shadow-[0_12px_30px_rgba(184,134,11,0.6)] hover:-translate-y-0.5 transition-all duration-300 border border-[#b8860b]/30"
-                                        >
-                                            <span className="relative z-10 flex items-center gap-2 sm:gap-4">
-                                                JOIN VIP SIGNALS NOW <span className="text-xl sm:text-4xl leading-none">&raquo;</span>
-                                            </span>
-                                        </Link>
-                                    ) : (
-                                        <button
-                                            onClick={() => setIsModalOpen(true)}
-                                            className="relative group inline-flex items-center justify-center bg-gradient-to-b from-[#f3e5ab] via-[#d4af37] to-[#b8860b] text-[#1e293b] font-black text-[11px] sm:text-lg md:text-2xl uppercase tracking-tighter px-4 sm:px-10 py-3 sm:py-5 rounded shadow-[0_8px_20px_rgba(184,134,11,0.4)] hover:shadow-[0_12px_30px_rgba(184,134,11,0.6)] hover:-translate-y-0.5 transition-all duration-300 border border-[#b8860b]/30"
-                                        >
-                                            <span className="relative z-10 flex items-center gap-2 sm:gap-4">
-                                                JOIN VIP SIGNALS NOW <span className="text-xl sm:text-4xl leading-none">&raquo;</span>
-                                            </span>
-                                        </button>
-                                    )}
+                                    <button
+                                        onClick={() => setIsModalOpen(true)}
+                                        className="relative group inline-flex items-center justify-center bg-gradient-to-b from-[#f3e5ab] via-[#d4af37] to-[#b8860b] text-[#1e293b] font-black text-[11px] sm:text-lg md:text-2xl uppercase tracking-tighter px-4 sm:px-10 py-3 sm:py-5 rounded shadow-[0_8px_20px_rgba(184,134,11,0.4)] hover:shadow-[0_12px_30px_rgba(184,134,11,0.6)] hover:-translate-y-0.5 transition-all duration-300 border border-[#b8860b]/30"
+                                    >
+                                        <span className="relative z-10 flex items-center gap-2 sm:gap-4">
+                                            JOIN VIP SIGNALS NOW <span className="text-xl sm:text-4xl leading-none">&raquo;</span>
+                                        </span>
+                                    </button>
                                     <p className="text-[10px] sm:text-sm text-[#64748b] mt-3 font-bold tracking-wide">Instant access after payment.</p>
                                 </div>
 
@@ -309,12 +360,12 @@ const VIPSignalsGroup = () => {
 
                                         {/* App Content */}
                                         <div className="flex-1 overflow-y-auto p-1.5 sm:p-4 space-y-2 sm:space-y-5 bg-gradient-to-b from-[#334155]/10 to-[#1e293b]/20 hide-scrollbar pb-3 sm:pb-6">
-                                            {signals.length === 0 ? (
+                                            {(!signals?.items || signals.items.length === 0) ? (
                                                 <div className="bg-white/95 backdrop-blur rounded-lg sm:rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-200 text-center flex flex-col items-center justify-center min-h-[100px] gap-2">
                                                     <span className="text-[10px] sm:text-[13px] font-bold text-gray-400">Loading signals...</span>
                                                 </div>
                                             ) : (
-                                                signals.map((signal, index) => (
+                                                signals.items.map((signal: any, index: number) => (
                                                     <div key={signal.id} className="bg-white/95 backdrop-blur rounded-lg sm:rounded-2xl p-2 sm:p-5 shadow-sm border border-gray-200">
                                                         <div className="flex items-center gap-1 sm:gap-2 font-black text-[#1e293b] text-[8px] sm:text-[15px] mb-1 sm:mb-4 truncate">
                                                             <span>{getSignalIcon(signal.instrument)}</span> {signal.instrument} - <span className={signal.type?.toLowerCase() === 'buy' ? 'text-green-500' : 'text-red-500'}>{(signal.type || 'buy').toUpperCase()}</span>
@@ -377,12 +428,12 @@ const VIPSignalsGroup = () => {
                                     </div>
                                     {/* Card Content */}
                                     <div className="divide-y divide-gray-100">
-                                        {signals.length === 0 ? (
+                                        {(!signals?.items || signals.items.length === 0) ? (
                                             <div className="p-8 text-center bg-gray-50/50">
                                                 <span className="text-sm font-bold text-gray-400">Loading signals...</span>
                                             </div>
                                         ) : (
-                                            signals.slice(0, 2).map((signal, index) => (
+                                            signals.items.slice(0, 2).map((signal: any, index: number) => (
                                                 <div key={signal.id} className="p-2 sm:p-8 hover:bg-slate-50/50 transition-colors">
                                                     <div className="flex items-center gap-1 sm:gap-2 font-black text-[#1e293b] text-[10px] sm:text-xl mb-1 sm:mb-4">
                                                         <span>{getSignalIcon(signal.instrument)}</span> {signal.instrument.split(' ')[0]} - <span className={signal.type?.toLowerCase() === 'buy' ? 'text-green-500' : 'text-red-500'}>{(signal.type || 'buy').toUpperCase()}</span>
@@ -452,27 +503,14 @@ const VIPSignalsGroup = () => {
 
                     {/* Bottom CTA */}
                     <div className="mt-16 flex flex-col items-center text-center">
-                        {groupPageLink ? (
-                            <Link
-                                href={groupPageLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="relative group inline-flex items-center justify-center bg-gradient-to-b from-[#f3e5ab] via-[#d4af37] to-[#b8860b] text-[#1e293b] font-black text-lg md:text-2xl uppercase tracking-widest px-10 md:px-16 py-5 rounded-md shadow-[0_15px_40px_rgba(184,134,11,0.3)] hover:shadow-[0_20px_50px_rgba(184,134,11,0.5)] transition-all duration-300 border-2 border-[#b8860b]/30 mb-12"
-                            >
-                                <span className="relative z-10 flex items-center gap-3">
-                                    JOIN VIP SIGNALS NOW <span className="text-3xl leading-none">&raquo;</span>
-                                </span>
-                            </Link>
-                        ) : (
-                            <button
-                                onClick={() => setIsModalOpen(true)}
-                                className="relative group inline-flex items-center justify-center bg-gradient-to-b from-[#f3e5ab] via-[#d4af37] to-[#b8860b] text-[#1e293b] font-black text-lg md:text-2xl uppercase tracking-widest px-10 md:px-16 py-5 rounded-md shadow-[0_15px_40px_rgba(184,134,11,0.3)] hover:shadow-[0_20px_50px_rgba(184,134,11,0.5)] transition-all duration-300 border-2 border-[#b8860b]/30 mb-12"
-                            >
-                                <span className="relative z-10 flex items-center gap-3">
-                                    JOIN VIP SIGNALS NOW <span className="text-3xl leading-none">&raquo;</span>
-                                </span>
-                            </button>
-                        )}
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="relative group inline-flex items-center justify-center bg-gradient-to-b from-[#f3e5ab] via-[#d4af37] to-[#b8860b] text-[#1e293b] font-black text-lg md:text-2xl uppercase tracking-widest px-10 md:px-16 py-5 rounded-md shadow-[0_15px_40px_rgba(184,134,11,0.3)] hover:shadow-[0_20px_50px_rgba(184,134,11,0.5)] transition-all duration-300 border-2 border-[#b8860b]/30 mb-12"
+                        >
+                            <span className="relative z-10 flex items-center gap-3">
+                                JOIN VIP SIGNALS NOW <span className="text-3xl leading-none">&raquo;</span>
+                            </span>
+                        </button>
 
 
                         <div className="max-w-4xl p-8 bg-white/40 border border-white/60 rounded-2xl backdrop-blur-sm">
@@ -489,7 +527,13 @@ const VIPSignalsGroup = () => {
             {/* NewsLetter Section */}
             {/* <NewsletterSection /> */}
 
-            <VIPPlanModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} paymentLinks={paymentLinks} />
+            <VIPPlanModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                planSlugs={planSlugs}
+                onSelectPlan={handlePlanSelect}
+                isProcessing={addingToCart}
+            />
         </div>
     );
 };

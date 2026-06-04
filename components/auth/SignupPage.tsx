@@ -46,7 +46,11 @@ const SignupPage = () => {
             setConfirmPassword('');
             setPrivacy(false);
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Registration failed. Please try again.');
+            if (err.response?.status === 409) {
+                setError('An account with this email already exists. Please try logging in or resetting your password.');
+            } else {
+                setError(err.response?.data?.message || 'Registration failed. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
@@ -81,8 +85,11 @@ const SignupPage = () => {
                         )}
 
                         {success && (
-                            <div className="bg-green-50 text-green-600 p-3 rounded mb-4 text-sm">
-                                {success}
+                            <div className="bg-green-50 text-green-700 p-4 rounded mb-4 text-sm border border-green-200">
+                                <p className="mb-1.5">{success}</p>
+                                <p className="font-bold text-red-600 drop-shadow-sm">
+                                    Please check your spam or junk folder if you do not see the email in your inbox.
+                                </p>
                             </div>
                         )}
 

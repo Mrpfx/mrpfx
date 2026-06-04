@@ -11,16 +11,18 @@ import { getMediaUrl } from '@/lib/utils';
 
 // Removed FALLBACK_INDICATORS
 const FreeTradingIndicatorsPage = () => {
-    const { data: indicators, isLoading } = useDataWithFallback(
+    const { data, isLoading } = useDataWithFallback(
         tradingToolsService.getTools,
-        [],
+        { items: [], total: 0, page: 1, pageSize: 20 },
         'indicator',
         'free',
-        20
+        50
     );
 
+    const indicators = data?.items || [];
+
     // Group indicators by category
-    const groupedCategories = indicators.reduce((acc: any[], indicator) => {
+    const groupedCategories = indicators.reduce((acc: any[], indicator: any) => {
         const catTitle = indicator.category || "General Indicators";
         let category = acc.find(c => c.title === catTitle);
         if (!category) {
@@ -30,7 +32,7 @@ const FreeTradingIndicatorsPage = () => {
         category.indicators.push({
             id: indicator.id,
             name: indicator.title,
-            features: indicator.features || [],
+            features: indicator.description.split('\n').filter((l: string) => l.trim().length > 0).slice(0, 3),
             imageSrc: getMediaUrl(indicator.image_url) || "/assets/indicators/chart-tablet.png",
             downloadUrl: indicator.download_url
         });
@@ -109,7 +111,7 @@ const FreeTradingIndicatorsPage = () => {
                             <p className="text-slate-500 font-medium text-lg">Files will be uploaded soon.</p>
                         </div>
                     ) : (
-                        categories.map((category, catIndex) => (
+                        categories.map((category: any, catIndex: number) => (
                             <div key={catIndex} className={catIndex > 0 ? "mt-24" : ""}>
                                 {/* Category Header */}
                                 <div className="flex items-center gap-6 mb-12">

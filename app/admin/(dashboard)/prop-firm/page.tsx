@@ -14,12 +14,18 @@ import {
     Clock,
     AlertCircle,
     User,
+    Trash2,
+    Settings,
+    LayoutGrid,
+    DollarSign,
+    ExternalLink,
+    Save,
     RefreshCw,
     Edit,
-    Eye,
-    Trash2
+    Eye
 } from 'lucide-react';
 import { propFirmService, PropFirmRegistrationData } from '@/services/prop-firm.service';
+import { getPropFirmSettings, updatePropFirmSettings, PricingTier } from '@/app/actions/prop-firm-settings';
 import { SuccessModal, ErrorModal, ConfirmModal } from '@/components/admin/Modals';
 import toast from 'react-hot-toast';
 
@@ -29,6 +35,55 @@ const STATUS_TABS = [
     { id: 'active', label: 'Active' },
     { id: 'completed', label: 'Completed' },
     { id: 'failed', label: 'Failed' },
+    { id: 'settings', label: 'Settings' },
+];
+
+const PRICING_GROUPS = [
+    {
+        title: "Guaranteed Pass - 2 Step Challenge",
+        tiers: [
+            { id: "guaranteed-2step-step1-50000", label: "Step 1 - $50k" },
+            { id: "guaranteed-2step-step1-100000", label: "Step 1 - $100k" },
+            { id: "guaranteed-2step-step1-200000", label: "Step 1 - $200k" },
+            { id: "guaranteed-2step-step1-500000", label: "Step 1 - $500k" },
+            { id: "guaranteed-2step-full-50000", label: "Full - $50k" },
+            { id: "guaranteed-2step-full-100000", label: "Full - $100k" },
+            { id: "guaranteed-2step-full-200000", label: "Full - $200k" },
+            { id: "guaranteed-2step-full-500000", label: "Full - $500k" },
+        ]
+    },
+    {
+        title: "Guaranteed Pass - 1 Step Challenge",
+        tiers: [
+            { id: "guaranteed-1step-full-50000", label: "Full - $50k" },
+            { id: "guaranteed-1step-full-100000", label: "Full - $100k" },
+            { id: "guaranteed-1step-full-200000", label: "Full - $200k" },
+            { id: "guaranteed-1step-full-500000", label: "Full - $500k" },
+        ]
+    },
+    {
+        title: "Standard Pass - 2 Step Challenge",
+        tiers: [
+            { id: "standard-2step-step1-50000", label: "Step 1 - $50k" },
+            { id: "standard-2step-step1-100000", label: "Step 1 - $100k" },
+            { id: "standard-2step-step1-200000", label: "Step 1 - $200k" },
+            { id: "standard-2step-step1-300000", label: "Step 1 - $300k" },
+            { id: "standard-2step-step1-500000", label: "Step 1 - $500k" },
+            { id: "standard-2step-full-50000", label: "Full - $50k" },
+            { id: "standard-2step-full-100000", label: "Full - $100k" },
+            { id: "standard-2step-full-200000", label: "Full - $200k" },
+            { id: "standard-2step-full-500000", label: "Full - $500k" },
+        ]
+    },
+    {
+        title: "Standard Pass - 1 Step Challenge",
+        tiers: [
+            { id: "standard-1step-full-50000", label: "Full - $50k" },
+            { id: "standard-1step-full-100000", label: "Full - $100k" },
+            { id: "standard-1step-full-200000", label: "Full - $200k" },
+            { id: "standard-1step-full-500000", label: "Full - $500k" },
+        ]
+    }
 ];
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -57,6 +112,13 @@ export default function PropFirmRegistrationsPage() {
     const [viewingRegistration, setViewingRegistration] = useState<PropFirmRegistrationData | null>(null);
     const [successModal, setSuccessModal] = useState({ isOpen: false, message: '' });
     const [errorModal, setErrorModal] = useState({ isOpen: false, message: '' });
+
+    // Settings State
+    const [propFirmDiscountActive, setPropFirmDiscountActive] = useState(false);
+    const [propFirmDiscountPercentage, setPropFirmDiscountPercentage] = useState(0);
+    const [propFirmPricingTiers, setPropFirmPricingTiers] = useState<Record<string, PricingTier>>({});
+    const [savingPropFirm, setSavingPropFirm] = useState(false);
+    const [propFirmMessage, setPropFirmMessage] = useState('');
 
     // Update State
     const [updating, setUpdating] = useState<string | number | null>(null);
@@ -90,6 +152,12 @@ export default function PropFirmRegistrationsPage() {
 
     useEffect(() => {
         fetchRegistrations();
+        // Fetch Settings
+        getPropFirmSettings().then(data => {
+            setPropFirmDiscountActive(data.discountActive || false);
+            setPropFirmDiscountPercentage(data.discountPercentage || 0);
+            setPropFirmPricingTiers(data.pricingTiers || {});
+        });
     }, [page]);
 
     const handleStatusUpdate = async (id: string | number, field: 'status' | 'payment_status', value: string) => {
@@ -104,6 +172,24 @@ export default function PropFirmRegistrationsPage() {
         } finally {
             setUpdating(null);
         }
+    };
+
+    const handleSaveSettings = async () => {
+        setSavingPropFirm(true);
+        setPropFirmMessage('');
+        try {
+            await updatePropFirmSettings({
+                discountActive: propFirmDiscountActive,
+                discountPercentage: propFirmDiscountPercentage,
+                pricingTiers: propFirmPricingTiers
+            });
+            toast.success('Settings saved successfully!');
+            setPropFirmMessage('Prop firm settings saved successfully!');
+        } catch (e) {
+            toast.error('Failed to save settings.');
+            setPropFirmMessage('Failed to save prop firm settings.');
+        }
+        setSavingPropFirm(false);
     };
 
     const filteredRegistrations = registrations.filter(reg => {
@@ -172,134 +258,290 @@ export default function PropFirmRegistrationsPage() {
                 ))}
             </div>
 
-            {/* Table */}
-            <div className="bg-[#111827] border border-gray-800 rounded-xl overflow-hidden shadow-xl shadow-black/20">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="border-b border-gray-800 text-gray-400 text-xs uppercase bg-[#1F2937]/50">
-                                <th className="p-4 font-medium">Order / Firm</th>
-                                <th className="p-4 font-medium">Account Details</th>
-                                <th className="p-4 font-medium">Status & Payment</th>
-                                <th className="p-4 font-medium">Contact</th>
-                                <th className="p-4 font-medium text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-sm divide-y divide-gray-800">
-                            {loading ? (
-                                <tr>
-                                    <td colSpan={5} className="p-8 text-center bg-[#111827]">
-                                        <div className="flex items-center justify-center gap-3 text-gray-400">
-                                            <div className="w-5 h-5 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-                                            <span>Loading registrations...</span>
+            {/* Settings Tab Content */}
+            {activeTab === 'settings' && (
+                <div className="bg-[#1F2937] border border-gray-800 rounded-xl overflow-hidden shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="p-6 border-b border-gray-800 flex items-center justify-between bg-[#111827]/50">
+                        <div>
+                            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                                <Settings className="w-5 h-5 text-[#d946ef]" />
+                                Prop Firm Global Settings
+                            </h2>
+                            <p className="text-sm text-gray-400 mt-1">Manage pricing, seller links, and global discounts for Pass Funded services.</p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            {propFirmMessage && (
+                                <span className={`text-sm ${propFirmMessage.includes('success') ? 'text-[#d946ef]' : 'text-red-400'}`}>
+                                    {propFirmMessage}
+                                </span>
+                            )}
+                            <button
+                                onClick={handleSaveSettings}
+                                disabled={savingPropFirm}
+                                className="flex items-center gap-2 px-6 py-2.5 bg-[#d946ef] hover:bg-[#c026d3] text-white font-bold rounded-lg transition-all active:scale-95 disabled:opacity-50"
+                            >
+                                <Save className="w-5 h-5" />
+                                {savingPropFirm ? 'Saving...' : 'Save Settings'}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="p-8 space-y-12">
+                        {/* Discount Section */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                            <div className="p-6 bg-[#111827] rounded-xl border border-gray-800 space-y-6">
+                                <h3 className="text-white font-bold flex items-center gap-2">
+                                    <Trophy className="w-4 h-4 text-amber-500" />
+                                    Global Discount Mode
+                                </h3>
+                                <div className="flex items-center gap-3 bg-gray-800/30 p-4 rounded-lg border border-gray-700/50">
+                                    <input
+                                        type="checkbox"
+                                        id="discountActive"
+                                        checked={propFirmDiscountActive}
+                                        onChange={(e) => setPropFirmDiscountActive(e.target.checked)}
+                                        className="w-5 h-5 bg-[#111827] border-gray-700 rounded text-[#d946ef] focus:ring-[#d946ef]"
+                                    />
+                                    <label htmlFor="discountActive" className="text-sm font-medium text-gray-300 cursor-pointer">
+                                        Activate Discount for all challenges
+                                    </label>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest pl-1">Discount Percentage (%)</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        value={propFirmDiscountPercentage}
+                                        onChange={(e) => setPropFirmDiscountPercentage(Number(e.target.value))}
+                                        className="w-full p-3 bg-[#1F2937] border border-gray-800 text-white rounded-lg focus:ring-1 focus:ring-[#d946ef] outline-none text-sm font-mono"
+                                        placeholder="e.g. 15"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="p-6 bg-[#d946ef]/5 rounded-xl border border-[#d946ef]/10">
+                                <h3 className="text-white font-bold flex items-center gap-2 mb-4">
+                                    <AlertCircle className="w-4 h-4 text-[#d946ef]" />
+                                    Information
+                                </h3>
+                                <p className="text-xs text-gray-400 leading-relaxed">
+                                    Updating these settings will immediately affect the pricing cards on the
+                                    <span className="text-white font-medium mx-1">/pass-funded-accounts</span>
+                                    page and the checkout wizard. Ensure all seller links are correct to prevent checkout failures.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Pricing Tiers Section */}
+                        <div className="space-y-6">
+                            <h3 className="text-white font-bold border-l-4 border-[#d946ef] pl-4">Pricing & Seller Links Configuration</h3>
+
+                            <div className="grid grid-cols-1 gap-12">
+                                {PRICING_GROUPS.map((group, groupIdx) => (
+                                    <div key={groupIdx} className="space-y-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-px flex-1 bg-gray-800" />
+                                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">{group.title}</span>
+                                            <div className="h-px flex-1 bg-gray-800" />
                                         </div>
-                                    </td>
-                                </tr>
-                            ) : filteredRegistrations.length === 0 ? (
-                                <tr>
-                                    <td colSpan={5} className="p-12 text-center bg-[#111827]">
-                                        <div className="flex flex-col items-center gap-3">
-                                            <div className="w-12 h-12 rounded-full bg-gray-800/50 flex items-center justify-center">
-                                                <Trophy className="w-6 h-6 text-gray-600" />
-                                            </div>
-                                            <div className="text-gray-400 font-medium">No registrations found</div>
+
+                                        <div className="grid grid-cols-1 gap-3">
+                                            {group.tiers.map((tier) => (
+                                                <div key={tier.id} className="bg-[#111827]/40 hover:bg-[#111827] p-4 rounded-xl border border-gray-800/50 hover:border-gray-700 transition-all grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                                                    <div className="lg:col-span-3">
+                                                        <span className="text-xs font-bold text-gray-300">{tier.label}</span>
+                                                    </div>
+                                                    <div className="lg:col-span-3 relative">
+                                                        <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
+                                                        <input
+                                                            type="number"
+                                                            value={propFirmPricingTiers[tier.id]?.price || 0}
+                                                            onChange={(e) => {
+                                                                const val = Number(e.target.value);
+                                                                setPropFirmPricingTiers(prev => ({
+                                                                    ...prev,
+                                                                    [tier.id]: { ...(prev[tier.id] || { sellerLink: '' }), price: val }
+                                                                }));
+                                                            }}
+                                                            className="w-full pl-9 pr-3 py-2 bg-[#1F2937]/50 border border-gray-800 text-white rounded-lg focus:ring-1 focus:ring-[#d946ef] outline-none text-xs font-mono"
+                                                            placeholder="Price"
+                                                        />
+                                                    </div>
+                                                    <div className="lg:col-span-6 relative">
+                                                        <ExternalLink className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
+                                                        <input
+                                                            type="text"
+                                                            value={propFirmPricingTiers[tier.id]?.sellerLink || ''}
+                                                            onChange={(e) => {
+                                                                const val = e.target.value;
+                                                                setPropFirmPricingTiers(prev => ({
+                                                                    ...prev,
+                                                                    [tier.id]: { ...(prev[tier.id] || { price: 0 }), sellerLink: val }
+                                                                }));
+                                                            }}
+                                                            className="w-full pl-9 pr-3 py-2 bg-[#1F2937]/50 border border-gray-800 text-white rounded-lg focus:ring-1 focus:ring-[#d946ef] outline-none text-xs font-mono"
+                                                            placeholder="Seller Link (Whop, Sellar, etc.)"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
-                                    </td>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Final Save Button */}
+                        <div className="pt-8 border-t border-gray-800 flex items-center justify-end gap-4">
+                            {propFirmMessage && (
+                                <span className={`text-sm ${propFirmMessage.includes('success') ? 'text-[#d946ef]' : 'text-red-400'}`}>
+                                    {propFirmMessage}
+                                </span>
+                            )}
+                            <button
+                                onClick={handleSaveSettings}
+                                disabled={savingPropFirm}
+                                className="flex items-center gap-2 px-12 py-3 bg-[#d946ef] hover:bg-[#c026d3] text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-[#d946ef]/20 disabled:opacity-50"
+                            >
+                                <Save className="w-5 h-5" />
+                                {savingPropFirm ? 'Saving...' : 'Save All Settings'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Table and list hidden when settings tab is active */}
+            {activeTab !== 'settings' && (
+                <div className="bg-[#111827] border border-gray-800 rounded-xl overflow-hidden shadow-xl shadow-black/20">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="border-b border-gray-800 text-gray-400 text-xs uppercase bg-[#1F2937]/50">
+                                    <th className="p-4 font-medium">Order / Firm</th>
+                                    <th className="p-4 font-medium">Account Details</th>
+                                    <th className="p-4 font-medium">Status & Payment</th>
+                                    <th className="p-4 font-medium">Contact</th>
+                                    <th className="p-4 font-medium text-right">Actions</th>
                                 </tr>
-                            ) : (
-                                filteredRegistrations.map((reg) => (
-                                    <tr key={reg.registration_id} className="hover:bg-[#1F2937]/50 transition-colors group">
-                                        <td className="p-4">
-                                            <div className="flex flex-col">
-                                                <span className="text-white font-bold">{reg.order_id}</span>
-                                                <span className="text-xs text-purple-400 mt-1">{reg.propfirm_name}</span>
-                                            </div>
-                                        </td>
-                                        <td className="p-4 text-gray-400">
-                                            <div className="flex flex-col gap-1">
-                                                <div className="flex items-center gap-1.5">
-                                                    <span className="text-white font-mono text-xs">{reg.login_id}</span>
-                                                    <span className="text-[10px] bg-gray-800 px-1.5 rounded text-gray-500">{reg.server_type}</span>
-                                                </div>
-                                                <p className="text-[10px] text-gray-500 italic truncate max-w-[150px]">{reg.server_name}</p>
-                                            </div>
-                                        </td>
-                                        <td className="p-4">
-                                            <div className="flex flex-col gap-2">
-                                                <div className="flex items-center gap-2">
-                                                    <StatusBadge status={reg.status} />
-                                                    <span className={`text-[10px] font-bold uppercase border px-1.5 py-0.5 rounded ${reg.payment_status === 'paid' ? 'text-emerald-400 border-emerald-500/30' : 'text-amber-400 border-amber-500/30'}`}>
-                                                        {reg.payment_status}
-                                                    </span>
-                                                    <button
-                                                        onClick={() => setEditingStatus(reg)}
-                                                        className="p-1 text-gray-500 hover:text-purple-400 transition-colors"
-                                                        title="Update Status"
-                                                    >
-                                                        <Edit className="w-3.5 h-3.5" />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="p-4">
-                                            <div className="flex flex-col text-xs text-gray-400 gap-1">
-                                                <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {reg.telegram_username}</span>
-                                                <span className="flex items-center gap-1"><User className="w-3 h-3" /> {reg.whatsapp_no}</span>
-                                            </div>
-                                        </td>
-                                        <td className="p-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <div className="flex flex-col items-end mr-2 text-[10px] text-gray-600">
-                                                    <span>{new Date(reg.created_at).toLocaleDateString()}</span>
-                                                    <span>{new Date(reg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                                </div>
-                                                <button
-                                                    onClick={() => setViewingRegistration(reg)}
-                                                    className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-all border border-transparent hover:border-gray-600"
-                                                    title="Quick View"
-                                                >
-                                                    <Eye className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => setConfirmDelete({ isOpen: true, id: reg.registration_id })}
-                                                    className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all border border-transparent hover:border-red-500/20"
-                                                    title="Delete"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
+                            </thead>
+                            <tbody className="text-sm divide-y divide-gray-800">
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan={5} className="p-8 text-center bg-[#111827]">
+                                            <div className="flex items-center justify-center gap-3 text-gray-400">
+                                                <div className="w-5 h-5 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                                                <span>Loading registrations...</span>
                                             </div>
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                ) : filteredRegistrations.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={5} className="p-12 text-center bg-[#111827]">
+                                            <div className="flex flex-col items-center gap-3">
+                                                <div className="w-12 h-12 rounded-full bg-gray-800/50 flex items-center justify-center">
+                                                    <Trophy className="w-6 h-6 text-gray-600" />
+                                                </div>
+                                                <div className="text-gray-400 font-medium">No registrations found</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    filteredRegistrations.map((reg) => (
+                                        <tr key={reg.registration_id} className="hover:bg-[#1F2937]/50 transition-colors group">
+                                            <td className="p-4">
+                                                <div className="flex flex-col">
+                                                    <span className="text-white font-bold">{reg.order_id}</span>
+                                                    <span className="text-xs text-purple-400 mt-1">{reg.propfirm_name}</span>
+                                                </div>
+                                            </td>
+                                            <td className="p-4 text-gray-400">
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="text-white font-mono text-xs">{reg.login_id}</span>
+                                                        <span className="text-[10px] bg-gray-800 px-1.5 rounded text-gray-500">{reg.server_type}</span>
+                                                    </div>
+                                                    <p className="text-[10px] text-gray-500 italic truncate max-w-[150px]">{reg.server_name}</p>
+                                                </div>
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <StatusBadge status={reg.status} />
+                                                        <span className={`text-[10px] font-bold uppercase border px-1.5 py-0.5 rounded ${reg.payment_status === 'paid' ? 'text-emerald-400 border-emerald-500/30' : 'text-amber-400 border-amber-500/30'}`}>
+                                                            {reg.payment_status}
+                                                        </span>
+                                                        <button
+                                                            onClick={() => setEditingStatus(reg)}
+                                                            className="p-1 text-gray-500 hover:text-purple-400 transition-colors"
+                                                            title="Update Status"
+                                                        >
+                                                            <Edit className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="flex flex-col text-xs text-gray-400 gap-1">
+                                                    <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {reg.telegram_username}</span>
+                                                    <span className="flex items-center gap-1"><User className="w-3 h-3" /> {reg.whatsapp_no}</span>
+                                                </div>
+                                            </td>
+                                            <td className="p-4 text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <div className="flex flex-col items-end mr-2 text-[10px] text-gray-600">
+                                                        <span>{new Date(reg.created_at).toLocaleDateString()}</span>
+                                                        <span>{new Date(reg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => setViewingRegistration(reg)}
+                                                        className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-all border border-transparent hover:border-gray-600"
+                                                        title="Quick View"
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setConfirmDelete({ isOpen: true, id: reg.registration_id })}
+                                                        className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all border border-transparent hover:border-red-500/20"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
 
-                {/* Pagination */}
-                <div className="flex items-center justify-between p-4 border-t border-gray-800 bg-[#111827]/30">
-                    <p className="text-xs text-gray-500">
-                        Showing <span className="text-gray-300">{filteredRegistrations.length}</span> registrations
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => setPage(p => Math.max(1, p - 1))}
-                            disabled={page === 1}
-                            className="p-2 text-gray-600 hover:text-white disabled:opacity-30 transition-colors"
-                        >
-                            <ChevronLeft className="w-5 h-5" />
-                        </button>
-                        <span className="text-xs text-gray-300 px-2 font-mono">{page}</span>
-                        <button
-                            onClick={() => setPage(p => p + 1)}
-                            disabled={registrations.length < limit}
-                            className="p-2 text-gray-600 hover:text-white disabled:opacity-30 transition-colors"
-                        >
-                            <ChevronRight className="w-5 h-5" />
-                        </button>
+                    {/* Pagination */}
+                    <div className="flex items-center justify-between p-4 border-t border-gray-800 bg-[#111827]/30">
+                        <p className="text-xs text-gray-500">
+                            Showing <span className="text-gray-300">{filteredRegistrations.length}</span> registrations
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setPage(p => Math.max(1, p - 1))}
+                                disabled={page === 1}
+                                className="p-2 text-gray-600 hover:text-white disabled:opacity-30 transition-colors"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </button>
+                            <span className="text-xs text-gray-300 px-2 font-mono">{page}</span>
+                            <button
+                                onClick={() => setPage(p => p + 1)}
+                                disabled={registrations.length < limit}
+                                className="p-2 text-gray-600 hover:text-white disabled:opacity-30 transition-colors"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Status Update Modal */}
             {editingStatus && (

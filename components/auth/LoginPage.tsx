@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { authService } from '@/lib/auth';
 
 const LoginPage = () => {
@@ -12,6 +12,8 @@ const LoginPage = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectPath = searchParams.get('redirect') || '/dashboard';
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -23,7 +25,7 @@ const LoginPage = () => {
                 login: email,
                 password: password,
             });
-            router.push('/dashboard'); // Redirect to dashboard after login
+            router.push(redirectPath); // Redirect after login
         } catch (err: any) {
             const errorDetail = err.response?.data?.detail;
             if (errorDetail === 'PASSWORD_RESET_REQUIRED') {

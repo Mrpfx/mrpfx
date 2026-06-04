@@ -13,7 +13,7 @@ import { getMediaUrl } from '@/lib/utils';
 const ForexBooksPage = () => {
     const { data: paidBooksSource, isLoading: isLoadingPaid } = useDataWithFallback(
         tradingToolsService.getTools,
-        [],
+        { items: [], total: 0, page: 1, pageSize: 3 },
         'book',
         'vip',
         3
@@ -21,7 +21,7 @@ const ForexBooksPage = () => {
 
     const { data: freeBooksSource, isLoading: isLoadingFree } = useDataWithFallback(
         tradingToolsService.getTools,
-        [],
+        { items: [], total: 0, page: 1, pageSize: 3 },
         'book',
         'free',
         3
@@ -42,8 +42,8 @@ const ForexBooksPage = () => {
     });
 
     const allBooks = [
-        ...paidBooksSource.map((book: any, i: number) => mapToBookProps(book, i)),
-        ...freeBooksSource.map((book: any, i: number) => mapToBookProps(book, i + 3))
+        ...(paidBooksSource?.items || []).map((book: any, i: number) => mapToBookProps(book, i)),
+        ...(freeBooksSource?.items || []).map((book: any, i: number) => mapToBookProps(book, i + 3))
     ];
 
     return (

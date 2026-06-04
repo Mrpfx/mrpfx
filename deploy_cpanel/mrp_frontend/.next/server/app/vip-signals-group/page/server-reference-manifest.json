@@ -1,0 +1,35 @@
+{
+  "node": {
+    "00913f5982e0644852ab617d1d68b1a085b6a6dc4d": {
+      "workers": {
+        "app/vip-signals-group/page": {
+          "moduleId": 23609,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        }
+      },
+      "layer": {
+        "app/vip-signals-group/page": "action-browser"
+      },
+      "exportedName": "getPromoBannerSettings",
+      "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+    },
+    "00bcaadc266e263e52aa687730cae9fca71d9ba6d2": {
+      "workers": {
+        "app/vip-signals-group/page": {
+          "moduleId": 23609,
+          "async": false,
+          "exportedName": "getVIPSettings",
+          "filename": "mrp_frontend/app/actions/vip-settings.ts"
+        }
+      },
+      "layer": {
+        "app/vip-signals-group/page": "action-browser"
+      },
+      "exportedName": "getVIPSettings",
+      "filename": "mrp_frontend/app/actions/vip-settings.ts"
+    }
+  },
+  "edge": {}
+}

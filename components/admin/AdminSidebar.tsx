@@ -20,6 +20,7 @@ import {
     BookOpen,
     Folder,
     Tag,
+    Ticket,
     ShoppingBag as OrdersIcon,
     MessageSquare,
     Layout,
@@ -76,6 +77,7 @@ const AdminSidebar = ({ isOpen = false, onClose }: AdminSidebarProps) => {
             title: '', // Main group
             items: [
                 { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+                { name: 'Coupons', href: '/admin/coupons', icon: Ticket },
                 { name: 'Users', href: '/admin/users', icon: Users },
                 { name: 'Orders', href: '/admin/orders', icon: OrdersIcon },
                 { name: 'Prop Firm', href: '/admin/prop-firm', icon: Trophy },

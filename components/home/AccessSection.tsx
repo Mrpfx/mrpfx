@@ -265,9 +265,10 @@ interface AccessItem {
     buttonStyle: "dark" | "light";
     buttonText?: string;
     onClick?: () => void;
+    onTradeJournalClick?: () => void;
 }
 
-const getAccessItems = (onMentorshipClick?: () => void): AccessItem[] => [
+const getAccessItems = (onMentorshipClick?: () => void, onTradeJournalClick?: () => void): AccessItem[] => [
     {
         title: "VIP Signals",
         description: "Get elite trade setups & VIP signals.",
@@ -326,6 +327,14 @@ const getAccessItems = (onMentorshipClick?: () => void): AccessItem[] => [
         buttonStyle: "dark"
     },
     {
+        title: "VIP Indicators",
+        description: "Professional tools for Forex, Gold & Indices.",
+        icon: <CustomIcons.PaidIndicators />,
+        iconBg: "bg-transparent",
+        href: "/vip-trading-indicators",
+        buttonStyle: "dark"
+    },
+    {
         title: "Free Bots",
         description: "Use free bots for automate trading.",
         icon: <CustomIcons.FreeBots />,
@@ -356,7 +365,8 @@ const getAccessItems = (onMentorshipClick?: () => void): AccessItem[] => [
         icon: <CustomIcons.TradeJournal />,
         iconBg: "bg-transparent",
         href: "/",
-        buttonStyle: "dark"
+        buttonStyle: "dark",
+        onClick: onTradeJournalClick
     },
     {
         title: "Risk Calculator",
@@ -387,10 +397,11 @@ const getAccessItems = (onMentorshipClick?: () => void): AccessItem[] => [
 
 interface AccessSectionProps {
     onMentorshipClick?: () => void;
+    onTradeJournalClick?: () => void;
 }
 
-export default function AccessSection({ onMentorshipClick }: AccessSectionProps) {
-    const accessItems = getAccessItems(onMentorshipClick);
+export default function AccessSection({ onMentorshipClick, onTradeJournalClick }: AccessSectionProps) {
+    const accessItems = getAccessItems(onMentorshipClick, onTradeJournalClick);
 
     return (
         <section className="bg-[#f8f9fc] py-16 lg:py-24">

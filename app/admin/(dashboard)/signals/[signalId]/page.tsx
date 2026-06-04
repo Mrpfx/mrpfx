@@ -40,7 +40,7 @@ export default function EditSignalPage() {
         const fetchSignal = async () => {
             try {
                 const signals = await adminDynamicService.getSignals();
-                const signal = signals.find(s => s.id === signalId);
+                const signal = signals.items.find(s => s.id === signalId);
                 if (signal) {
                     setFormData(signal);
                     if (signal.image_url) {
@@ -80,6 +80,7 @@ export default function EditSignalPage() {
         try {
             const submitData = {
                 ...formData,
+                price: formData.price === '' ? '0' : formData.price,
                 image_url: featuredImage
                     ? relativizeMediaUrl((featuredImage as any).url || featuredImage.source_url)
                     : relativizeMediaUrl(formData.image_url)

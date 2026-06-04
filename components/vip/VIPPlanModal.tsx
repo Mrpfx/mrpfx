@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
-import { X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Loader2 } from 'lucide-react';
 
 interface VIPPlan {
     badge: string;
@@ -11,20 +10,28 @@ interface VIPPlan {
     buttonText: string;
     highlight: boolean;
     topBadge?: string;
-    paymentLink?: string;
+    slug?: string;
 }
 
 interface VIPPlanModalProps {
     isOpen: boolean;
     onClose: () => void;
-    paymentLinks?: {
+    planSlugs?: {
         oneMonth: string;
         twelveMonths: string;
         unlimited: string;
     };
+    onSelectPlan: (slug: string) => Promise<void>;
+    isProcessing?: boolean;
 }
 
-const VIPPlanModal: React.FC<VIPPlanModalProps> = ({ isOpen, onClose, paymentLinks }) => {
+const VIPPlanModal: React.FC<VIPPlanModalProps> = ({ isOpen, onClose, planSlugs, onSelectPlan, isProcessing }) => {
+    const [localProcessingSlug, setLocalProcessingSlug] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!isOpen) setLocalProcessingSlug(null);
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     const plans: VIPPlan[] = [
@@ -34,7 +41,7 @@ const VIPPlanModal: React.FC<VIPPlanModalProps> = ({ isOpen, onClose, paymentLin
             price: '$199',
             buttonText: 'Get 1 Month Access',
             highlight: false,
-            paymentLink: paymentLinks?.oneMonth
+            slug: planSlugs?.oneMonth
         },
         {
             badge: 'BEST VALUE',
@@ -43,7 +50,7 @@ const VIPPlanModal: React.FC<VIPPlanModalProps> = ({ isOpen, onClose, paymentLin
             buttonText: 'Get 12 Months Access',
             highlight: true,
             topBadge: 'MOST POPULAR',
-            paymentLink: paymentLinks?.twelveMonths
+            slug: planSlugs?.twelveMonths
         },
         {
             badge: 'BEST DEAL',
@@ -51,7 +58,7 @@ const VIPPlanModal: React.FC<VIPPlanModalProps> = ({ isOpen, onClose, paymentLin
             price: '$499',
             buttonText: 'Get Lifetime Access',
             highlight: false,
-            paymentLink: paymentLinks?.unlimited
+            slug: planSlugs?.unlimited
         }
     ];
 
@@ -73,7 +80,7 @@ const VIPPlanModal: React.FC<VIPPlanModalProps> = ({ isOpen, onClose, paymentLin
                 </button>
 
                 {/* Scrollable content inside modal */}
-                <div className="overflow-y-auto flex-1 px-5 pt-6 pb-5 sm:px-8 sm:pt-8 sm:pb-6">
+                <div className="overflow-y-auto flex-1 px-5 pt-6 pb-5 sm:px-8 sm:pt-8 sm:pb-6 hide-scrollbar">
                     {/* Header */}
                     <div className="text-center mb-4 sm:mb-6 pr-6">
                         <h2 className="text-2xl sm:text-4xl font-extrabold text-[#2A2A72] mb-1 sm:mb-2 tracking-tight">Join VIP Signals</h2>
@@ -106,23 +113,22 @@ const VIPPlanModal: React.FC<VIPPlanModalProps> = ({ isOpen, onClose, paymentLin
                                     </div>
 
                                     <div className="shrink-0">
-                                        {plan.paymentLink ? (
-                                            <Link
-                                                href={plan.paymentLink}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="block py-2.5 px-4 sm:py-3 sm:px-6 bg-gradient-to-b from-[#f3e5ab] via-[#d4af37] to-[#b8860b] text-[#1e293b] font-black text-xs sm:text-sm uppercase rounded shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 text-center whitespace-nowrap"
-                                            >
-                                                {plan.buttonText}
-                                            </Link>
-                                        ) : (
-                                            <button
-                                                className="py-2.5 px-4 sm:py-3 sm:px-6 bg-gradient-to-b from-[#f3e5ab] via-[#d4af37] to-[#b8860b] text-[#1e293b] font-black text-xs sm:text-sm uppercase rounded shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap"
-                                                onClick={onClose}
-                                            >
-                                                {plan.buttonText}
-                                            </button>
-                                        )}
+                                        <button
+                                            onClick={async () => {
+                                                if (plan.slug) {
+                                                    setLocalProcessingSlug(plan.slug);
+                                                    try {
+                                                        await onSelectPlan(plan.slug);
+                                                    } catch (e) {
+                                                        setLocalProcessingSlug(null);
+                                                    }
+                                                }
+                                            }}
+                                            disabled={isProcessing || !plan.slug}
+                                            className="block py-2.5 px-4 sm:py-3 sm:px-6 bg-gradient-to-b from-[#f3e5ab] via-[#d4af37] to-[#b8860b] text-[#1e293b] font-black text-xs sm:text-sm uppercase rounded shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 text-center whitespace-nowrap disabled:opacity-50 flex items-center justify-center gap-2 min-w-[140px]"
+                                        >
+                                            {isProcessing && localProcessingSlug === plan.slug ? <Loader2 className="w-4 h-4 animate-spin" /> : plan.buttonText}
+                                        </button>
                                     </div>
                                 </div>
                             </div>

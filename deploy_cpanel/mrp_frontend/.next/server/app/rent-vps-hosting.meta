@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/rent-vps-hosting/layout,_N_T_/rent-vps-hosting/page,_N_T_/rent-vps-hosting"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/rent-vps-hosting/__PAGE__",
+    "/rent-vps-hosting",
+    "/_index",
+    "/_head"
+  ]
+}

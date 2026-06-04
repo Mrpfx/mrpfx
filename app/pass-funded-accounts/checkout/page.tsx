@@ -1,4 +1,5 @@
 import React from 'react';
+import { Suspense } from 'react';
 import CheckoutWizard from '@/components/pass-funded-accounts/CheckoutWizard';
 
 export const metadata = {
@@ -8,8 +9,10 @@ export const metadata = {
 
 export default function PassFundedAccountsCheckoutPage() {
     return (
-        <div className="bg-[#f8fafc] min-h-screen pt-20">
-            <CheckoutWizard />
+        <div className="bg-[#f8fafc] min-h-screen">
+            <Suspense fallback={<div />}>
+                <CheckoutWizard />
+            </Suspense>
         </div>
     );
 }

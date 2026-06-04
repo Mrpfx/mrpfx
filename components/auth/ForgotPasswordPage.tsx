@@ -53,8 +53,11 @@ const ForgotPasswordPage = () => {
                     )}
 
                     {success && (
-                        <div className="bg-green-50 text-green-600 p-3 rounded mb-4 text-sm">
-                            {success}
+                        <div className="bg-green-50 text-green-700 p-4 rounded mb-4 text-sm border border-green-200">
+                            <p className="mb-1.5">{success}</p>
+                            <p className="font-bold text-red-600 drop-shadow-sm">
+                                Please check your spam or junk folder if you do not see the email in your inbox.
+                            </p>
                         </div>
                     )}
 

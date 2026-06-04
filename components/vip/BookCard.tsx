@@ -4,7 +4,10 @@ import { useRouter } from 'next/navigation';
 import { Star, Download, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import { cartService } from '@/lib/cart';
-import { getMediaUrl } from '@/lib/utils';
+import { getMediaUrl, truncateWords } from '@/lib/utils';
+import { authService } from '@/lib/auth';
+import { useState, useEffect } from 'react';
+import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
 
 interface BookCardProps {
     id: number;
@@ -32,26 +35,30 @@ const BookCard = ({
     imageSrc
 }: BookCardProps) => {
     const router = useRouter();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isDownloading, setIsDownloading] = useState(false);
+    const { withAuth } = useRequireAuth();
 
-    const handleAction = async () => {
-        if (isFree && downloadUrl && downloadUrl !== "#") {
-            window.open(downloadUrl, '_blank');
-            return;
-        }
+    useEffect(() => {
+        setIsLoggedIn(!!authService.getUserFromToken());
+        const handleAuthChange = () => setIsLoggedIn(!!authService.getUserFromToken());
+        window.addEventListener('auth-change', handleAuthChange);
+        return () => window.removeEventListener('auth-change', handleAuthChange);
+    }, []);
 
-        try {
-            await cartService.addToCart(id, 1);
-            router.push('/checkout');
-        } catch (error) {
-            console.error("Failed to add to cart:", error);
-            const fallbackUrl = isFree ? downloadUrl : buyUrl;
-            if (fallbackUrl && fallbackUrl !== "#") {
-                window.location.href = fallbackUrl;
-            }
-        }
+    const handleAction = (e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        setIsDownloading(true);
+        setTimeout(() => {
+            router.push(`/book/${id}`);
+        }, 300);
     };
     return (
-        <div className="bg-white rounded-2xl md:rounded-[24px] overflow-hidden border border-slate-100 flex flex-col h-full shadow-[0_10px_30px_rgba(0,0,0,0.04)] group hover:border-blue-100 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-500 max-w-[400px] mx-auto w-full">
+        <div
+            onClick={handleAction}
+            className="bg-white rounded-2xl md:rounded-[24px] overflow-hidden border border-slate-100 flex flex-col h-full shadow-[0_10px_30px_rgba(0,0,0,0.04)] group hover:border-blue-100 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-500 max-w-[400px] mx-auto w-full cursor-pointer"
+        >
             {/* Image Section */}
             <div className="relative aspect-[4/5] overflow-hidden bg-slate-50">
                 {imageSrc ? (
@@ -84,16 +91,24 @@ const BookCard = ({
                     {title}
                 </h4>
                 <p className="text-slate-500 text-[11px] md:text-sm font-medium mb-4 md:mb-8 leading-relaxed line-clamp-2 md:line-clamp-3">
-                    {description}
+                    {truncateWords(description, 25)}
                 </p>
 
                 <div className="mt-auto flex flex-col items-center gap-2 md:gap-3">
                     {isFree ? (
                         <button
                             onClick={handleAction}
-                            className="w-full bg-[#1e293b] hover:bg-slate-800 text-white font-black py-2 md:py-3.5 px-4 rounded-xl active:scale-95 transition-all duration-300 shadow-lg shadow-slate-200 block text-center uppercase tracking-tighter text-xs md:text-lg"
+                            disabled={isDownloading}
+                            className={`w-full bg-[#1e293b] hover:bg-slate-800 text-white font-black py-2 md:py-3.5 px-4 rounded-xl active:scale-95 transition-all duration-300 shadow-lg shadow-slate-200 block text-center uppercase tracking-tighter text-xs md:text-lg ${isDownloading ? 'opacity-80 cursor-not-allowed' : ''}`}
                         >
-                            Free Download
+                            {isDownloading ? (
+                                <div className="flex items-center justify-center gap-2">
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    <span>Processing...</span>
+                                </div>
+                            ) : (
+                                'Free Download'
+                            )}
                         </button>
                     ) : (
                         <>

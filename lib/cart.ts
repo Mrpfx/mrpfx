@@ -14,11 +14,9 @@ import type {
 export type { WCCart };
 
 export const cartService = {
-    /**
-     * Get the current user's shopping cart
-     */
-    getCart: async (): Promise<WCCart> => {
-        const response = await api.get<WCCart>('/wordpress/wc/cart');
+    getCart: async (paymentMethod?: string): Promise<WCCart> => {
+        const params = paymentMethod ? { payment_method: paymentMethod } : {};
+        const response = await api.get<WCCart>('/wordpress/wc/cart', { params });
         return response.data;
     },
 
@@ -31,6 +29,17 @@ export const cartService = {
         variationId?: number,
         customFields?: Record<string, string>
     ): Promise<WCCart> => {
+        // Enforce single-item cart limit by auto-clearing previous items
+        try {
+            const currentCartResponse = await api.get<WCCart>('/wordpress/wc/cart');
+            const currentCart = currentCartResponse.data;
+            if (currentCart && currentCart.items && currentCart.items.length > 0) {
+                await api.delete('/wordpress/wc/cart/clear');
+            }
+        } catch (e) {
+            console.error('Failed to pre-clear cart for single-item enforcement', e);
+        }
+
         const data: WCAddToCartRequest = {
             product_id: productId,
             quantity,
@@ -38,6 +47,12 @@ export const cartService = {
             custom_fields: customFields,
         };
         const response = await api.post<WCCart>('/wordpress/wc/cart/add', data);
+
+        // Dispatch event so UI components (Header, Modals) stay in sync
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cart-updated'));
+        }
+
         return response.data;
     },
 
@@ -55,6 +70,9 @@ export const cartService = {
             variation_id: variationId,
         };
         const response = await api.put<WCCart>('/wordpress/wc/cart/update', data);
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cart-updated'));
+        }
         return response.data;
     },
 
@@ -73,38 +91,55 @@ export const cartService = {
             `/wordpress/wc/cart/remove/${productId}`,
             { params }
         );
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cart-updated'));
+        }
         return response.data;
     },
 
     /**
      * Clear all items from the cart
      */
-    clearCart: async (): Promise<WCCart> => {
-        const response = await api.delete<WCCart>('/wordpress/wc/cart/clear');
+    clearCart: async (paymentMethod?: string): Promise<WCCart> => {
+        const params = paymentMethod ? { payment_method: paymentMethod } : {};
+        const response = await api.delete<WCCart>('/wordpress/wc/cart/clear', { params });
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cart-updated'));
+        }
         return response.data;
     },
 
     /**
      * Apply a coupon code to the cart
      */
-    applyCoupon: async (couponCode: string): Promise<WCCart> => {
+    applyCoupon: async (couponCode: string, paymentMethod?: string): Promise<WCCart> => {
         const data: WCApplyCouponRequest = {
             coupon_code: couponCode,
         };
+        const params = paymentMethod ? { payment_method: paymentMethod } : {};
         const response = await api.post<WCCart>(
             '/wordpress/wc/cart/coupon',
-            data
+            data,
+            { params }
         );
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cart-updated'));
+        }
         return response.data;
     },
 
     /**
      * Remove a coupon from the cart
      */
-    removeCoupon: async (couponCode: string): Promise<WCCart> => {
+    removeCoupon: async (couponCode: string, paymentMethod?: string): Promise<WCCart> => {
+        const params = paymentMethod ? { payment_method: paymentMethod } : {};
         const response = await api.delete<WCCart>(
-            `/wordpress/wc/cart/coupon/${couponCode}`
+            `/wordpress/wc/cart/coupon/${couponCode}`,
+            { params }
         );
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cart-updated'));
+        }
         return response.data;
     },
 };

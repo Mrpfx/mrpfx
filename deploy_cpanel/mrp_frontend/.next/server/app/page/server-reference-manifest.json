@@ -1,0 +1,35 @@
+{
+  "node": {
+    "00913f5982e0644852ab617d1d68b1a085b6a6dc4d": {
+      "workers": {
+        "app/page": {
+          "moduleId": 13047,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      },
+      "exportedName": "getPromoBannerSettings",
+      "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+    },
+    "0092ca78d178c98ce0bf49f60cbe7dd0a703e83de0": {
+      "workers": {
+        "app/page": {
+          "moduleId": 13047,
+          "async": false,
+          "exportedName": "getMentorshipSettings",
+          "filename": "mrp_frontend/app/actions/mentorship-settings.ts"
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      },
+      "exportedName": "getMentorshipSettings",
+      "filename": "mrp_frontend/app/actions/mentorship-settings.ts"
+    }
+  },
+  "edge": {}
+}

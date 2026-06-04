@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import ResourceAuthForm from '@/components/resource/ResourceAuthForm';
 
 export default function IndicatorsPage() {
@@ -31,7 +32,9 @@ export default function IndicatorsPage() {
 
             {/* Registration Form Section */}
             <div className="container mx-auto px-4 my-[50px] relative z-20">
-                <ResourceAuthForm title="Indicators" />
+                <Suspense fallback={<div />}>
+                    <ResourceAuthForm title="Indicators" />
+                </Suspense>
             </div>
         </div>
     );

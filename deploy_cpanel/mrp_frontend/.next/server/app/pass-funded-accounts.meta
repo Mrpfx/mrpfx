@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/pass-funded-accounts/layout,_N_T_/pass-funded-accounts/page,_N_T_/pass-funded-accounts"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/pass-funded-accounts/__PAGE__",
+    "/pass-funded-accounts",
+    "/_index",
+    "/_head"
+  ]
+}

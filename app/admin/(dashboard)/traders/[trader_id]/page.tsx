@@ -65,14 +65,23 @@ export default function TraderPerformancePage() {
                 perfData = perfResponse.performance;
             }
 
-            const found = traders.find(t => t.trader_id === traderId);
+            const safeId = traderId ? traderId.toLowerCase().trim() : '';
+            const decodedId = traderId ? decodeURIComponent(traderId).toLowerCase().trim() : '';
+            
+            const found = traders.find(t => {
+                if (!t) return false;
+                const tid = String(t.trader_id || t.id || '').toLowerCase().trim();
+                const encTid = encodeURIComponent(tid);
+                return tid === decodedId || tid === safeId || encTid === safeId || tid.replace(/\s+/g, '%20') === safeId;
+            });
+            
             if (found) {
                 setTrader(found);
             }
             setPerformances(perfData);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to fetch data:', error);
-            setErrorModal({ isOpen: true, message: 'Failed to fetch trader performance data.' });
+            setErrorModal({ isOpen: true, message: `Failed to fetch trader performance data: ${error?.message || 'Unknown error'}` });
         } finally {
             setLoading(false);
         }
@@ -132,6 +141,21 @@ export default function TraderPerformancePage() {
             <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
                 <div className="w-10 h-10 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
                 <p className="text-gray-400">Loading performance records...</p>
+            </div>
+        );
+    }
+
+    if (!trader && !loading) {
+        return (
+            <div className="text-center py-20">
+                <p className="text-gray-400">Trader not found.</p>
+                <p className="text-xs text-gray-500 mt-2">ID: {traderId}</p>
+                <button
+                    onClick={() => router.push('/admin/traders')}
+                    className="mt-4 text-purple-400 hover:underline"
+                >
+                    Back to Traders
+                </button>
             </div>
         );
     }

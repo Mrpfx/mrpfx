@@ -1,0 +1,20 @@
+{
+  "node": {
+    "00913f5982e0644852ab617d1d68b1a085b6a6dc4d": {
+      "workers": {
+        "app/admin/(dashboard)/courses/page": {
+          "moduleId": 15074,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/courses/page": "action-browser"
+      },
+      "exportedName": "getPromoBannerSettings",
+      "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+    }
+  },
+  "edge": {}
+}

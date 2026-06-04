@@ -32,13 +32,15 @@ export default function EditBookPage() {
         status: 'publish',
         price: '',
         image_url: '',
+        seller_payment_link: '',
+        whop_payment_link: '',
     });
 
     useEffect(() => {
         const fetchBook = async () => {
             try {
                 const books = await adminDynamicService.getBooks();
-                const book = books.find(b => b.id === bookId);
+                const book = books.items.find(b => b.id === bookId);
                 if (book) {
                     setFormData(book);
                     if (book.image_url) {
@@ -78,6 +80,7 @@ export default function EditBookPage() {
         try {
             const submitData = {
                 ...formData,
+                price: formData.price === '' ? '0' : formData.price,
                 image_url: featuredImage
                     ? relativizeMediaUrl((featuredImage as any).url || featuredImage.source_url)
                     : relativizeMediaUrl(formData.image_url)
@@ -222,7 +225,7 @@ export default function EditBookPage() {
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-gray-400 flex items-center gap-2">
                                     <Lock className="w-3 h-3 text-orange-500" />
-                                    Whop Access URL
+                                    Whop Access URL (Native/Direct link)
                                 </label>
                                 <input
                                     type="url"
@@ -230,6 +233,28 @@ export default function EditBookPage() {
                                     placeholder="https://whop.com/checkout/..."
                                     value={formData.purchase_url}
                                     onChange={(e) => handleChange('purchase_url', e.target.value)}
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-400">Selar Payment Link (Optional)</label>
+                                <input
+                                    type="url"
+                                    className="w-full bg-gray-800 text-white text-sm rounded-lg px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 border border-transparent placeholder-gray-600"
+                                    placeholder="https://selar.co/..."
+                                    value={formData.seller_payment_link}
+                                    onChange={(e) => handleChange('seller_payment_link', e.target.value)}
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-400">Whop Payment Link (Optional)</label>
+                                <input
+                                    type="url"
+                                    className="w-full bg-gray-800 text-white text-sm rounded-lg px-4 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 border border-transparent placeholder-gray-600"
+                                    placeholder="https://whop.com/..."
+                                    value={formData.whop_payment_link}
+                                    onChange={(e) => handleChange('whop_payment_link', e.target.value)}
                                 />
                             </div>
 

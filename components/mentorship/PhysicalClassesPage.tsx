@@ -1,15 +1,90 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Check, ShieldCheck, PlayCircle, MapPin, X, ArrowRight } from 'lucide-react';
+import { Check, ShieldCheck, PlayCircle, MapPin, X, ArrowRight, Loader2 } from 'lucide-react';
+import { productsService } from '@/lib/products';
+import { cartService } from '@/lib/cart';
+import { getPhysicalClassesSettings } from '@/app/actions/physical-classes-settings';
+import { useCartAuth } from '@/hooks/useCartAuth';
 
 export default function PhysicalClassesPage() {
     const [selectedPackage, setSelectedPackage] = useState<'standard' | 'private' | null>(null);
     const [showFloorPopup, setShowFloorPopup] = useState<'Abuja' | 'Lagos' | null>(null);
     const [showGuideText, setShowGuideText] = useState(false);
+    const [addingToCart, setAddingToCart] = useState<'standard' | 'private' | null>(null);
+    const [settings, setSettings] = useState<{ classASlug: string, classBSlug: string } | null>(null);
     const floorsRef = useRef<HTMLDivElement>(null);
+    const { isAuthenticated, savePendingAction, getPendingAction, clearPendingAction, redirectToLogin } = useCartAuth();
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            const data = await getPhysicalClassesSettings();
+            setSettings(data);
+        };
+        fetchSettings();
+    }, []);
+
+    useEffect(() => {
+        const checkPendingAction = async () => {
+            const pendingAction = getPendingAction();
+            if (pendingAction && isAuthenticated()) {
+                // If we have a pending action, it means they just logged in after clicking enroll
+                // We need to find which package they were trying to enroll in based on the product ID
+                // But it's easier to just let them click it again or we can re-execute if we had the slug
+                // For now, let's just clear it and if they click again it works.
+                // Alternatively, if we know the product ID matches one of our slugs...
+                if (settings) {
+                    const classA = await productsService.getProductBySlug(settings.classASlug);
+                    const classB = await productsService.getProductBySlug(settings.classBSlug);
+
+                    if (pendingAction.productId === classA.id) {
+                        handleEnroll('standard', true);
+                    } else if (pendingAction.productId === classB.id) {
+                        handleEnroll('private', true);
+                    }
+                }
+                clearPendingAction();
+            }
+        };
+        if (settings) checkPendingAction();
+    }, [settings, isAuthenticated]);
+
+    const handleEnroll = async (pkg: 'standard' | 'private', skipAuthCheck = false) => {
+        if (!settings) return;
+
+        const slug = pkg === 'standard' ? settings.classASlug : settings.classBSlug;
+
+        try {
+            setAddingToCart(pkg);
+            const product = await productsService.getProductBySlug(slug);
+
+            if (!skipAuthCheck && !isAuthenticated()) {
+                savePendingAction({
+                    type: 'ADD_TO_CART',
+                    productId: product.id,
+                    quantity: 1
+                });
+                redirectToLogin();
+                return;
+            }
+
+            await cartService.addToCart(product.id, 1);
+
+            // If they are on the popup, we open the checkout directly.
+            // If they are not (clicked from main cards), we scroll to floors first.
+            if (showFloorPopup) {
+                window.dispatchEvent(new CustomEvent('open-checkout'));
+            } else {
+                scrollToFloors(pkg);
+            }
+        } catch (error) {
+            console.error('Enrollment failed:', error);
+        } finally {
+            setAddingToCart(null);
+        }
+    };
 
     const features = [
         "Beginner \u2192 Advanced Curriculum",
@@ -34,12 +109,12 @@ export default function PhysicalClassesPage() {
 
     const floorDetails = {
         Abuja: {
-            address: "Suite 305, Plot 1083, Garki District, Abuja, Nigeria",
-            map: "https://maps.google.com/?q=Abuja+Trading+Floor"
+            address: "Suite B5, no. 1 Omotayo Eremiye Crescent, Arab Road, Abuja",
+            map: "https://maps.google.com/?q=Arab+Road+Abuja"
         },
         Lagos: {
-            address: "2nd Floor, 15 Admiralty Way, Lekki Phase 1, Lagos, Nigeria",
-            map: "https://maps.google.com/?q=Lagos+Trading+Floor"
+            address: "(The Place Restaurant) Ikota KM 14, Lekki-Epe Expressway, Lagos, Eti-Osa, Lekki 105101, Lagos, Nigeria",
+            map: "https://maps.google.com/?q=The+Place+Restaurant+Ikota+Lekki"
         }
     };
 
@@ -106,7 +181,7 @@ export default function PhysicalClassesPage() {
                         <div className="mb-3 md:mb-6">
                             <h3 className="text-[#2B3563] text-[13px] md:text-2xl font-bold mb-1 md:mb-3 tracking-tight leading-tight">Physical Class Mentorship</h3>
                             <div className="flex flex-col md:flex-row md:items-baseline gap-0.5 md:gap-3 flex-wrap">
-                                <span className="text-[17px] md:text-4xl text-[#B9812A] font-black drop-shadow-sm leading-none">₦200,000</span>
+                                <span className="text-[17px] md:text-3xl text-[#B9812A] font-black drop-shadow-sm leading-none">₦200,000 / $150</span>
                                 <span className="text-[#64748B] text-[9px] md:text-[13px] font-semibold tracking-wide">(All charges included)</span>
                             </div>
                         </div>
@@ -145,10 +220,15 @@ export default function PhysicalClassesPage() {
 
                         <div className="mt-auto pt-3 md:pt-6 border-t border-gray-100">
                             <button
-                                onClick={() => scrollToFloors('standard')}
-                                className="w-full relative group overflow-hidden bg-[#1E3A8A] hover:bg-[#1A255C] text-white font-bold py-2 md:py-4 rounded-lg md:rounded-xl shadow-md transition-all duration-300"
+                                onClick={() => handleEnroll('standard')}
+                                disabled={addingToCart === 'standard'}
+                                className="w-full relative group overflow-hidden bg-[#1E3A8A] hover:bg-[#1A255C] text-white font-bold py-2 md:py-4 rounded-lg md:rounded-xl shadow-md transition-all duration-300 flex items-center justify-center"
                             >
-                                <span className="relative z-10 tracking-wider text-[8px] md:text-[14px] uppercase block truncate">ENROLL NOW</span>
+                                {addingToCart === 'standard' ? (
+                                    <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
+                                ) : (
+                                    <span className="relative z-10 tracking-wider text-[8px] md:text-[14px] uppercase block truncate">ENROLL NOW</span>
+                                )}
                             </button>
                         </div>
                     </div>
@@ -162,7 +242,7 @@ export default function PhysicalClassesPage() {
                         <div className="mb-3 md:mb-6">
                             <h3 className="text-[#1E293B] text-[13px] md:text-2xl font-bold mb-1 md:mb-3 tracking-tight leading-tight">Private Physical Mentorship</h3>
                             <div className="flex flex-col md:flex-row md:items-baseline gap-0.5 md:gap-3">
-                                <span className="text-[17px] md:text-4xl text-[#059669] font-black drop-shadow-sm leading-none">₦300,000</span>
+                                <span className="text-[17px] md:text-3xl text-[#059669] font-black drop-shadow-sm leading-none">₦300,000 / $220</span>
                             </div>
                         </div>
 
@@ -189,11 +269,16 @@ export default function PhysicalClassesPage() {
 
                         <div className="mt-auto">
                             <button
-                                onClick={() => scrollToFloors('private')}
-                                className="w-full relative group overflow-hidden bg-gradient-to-r from-[#B9812A] via-[#E2B75A] to-[#B9812A] text-[#111] font-bold py-2 md:py-4 rounded-lg md:rounded-xl shadow-[0_10px_25px_rgba(185,129,42,0.3)] transform hover:scale-[1.02] transition-all duration-300"
+                                onClick={() => handleEnroll('private')}
+                                disabled={addingToCart === 'private'}
+                                className="w-full relative group overflow-hidden bg-gradient-to-r from-[#B9812A] via-[#E2B75A] to-[#B9812A] text-[#111] font-bold py-2 md:py-4 rounded-lg md:rounded-xl shadow-[0_10px_25px_rgba(185,129,42,0.3)] transform hover:scale-[1.02] transition-all duration-300 flex items-center justify-center"
                             >
                                 <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
-                                <span className="relative z-10 tracking-wider text-[8px] md:text-[14px] uppercase drop-shadow-sm block truncate px-1">ENROLL NOW</span>
+                                {addingToCart === 'private' ? (
+                                    <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
+                                ) : (
+                                    <span className="relative z-10 tracking-wider text-[8px] md:text-[14px] uppercase drop-shadow-sm block truncate px-1">ENROLL NOW</span>
+                                )}
                             </button>
                         </div>
                     </div>
@@ -390,16 +475,23 @@ export default function PhysicalClassesPage() {
                                             </div>
                                             <div className="text-right">
                                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Price</p>
-                                                <p className="text-xl font-bold text-[#B9812A]">{packageDetails[selectedPackage].price}</p>
+                                                <p className="text-xl font-bold text-[#B9812A]">
+                                                    {selectedPackage === 'standard' ? '₦200,000 / $150' : '₦300,000 / $220'}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
-                                    <Link
-                                        href={`/checkout?product=${selectedPackage}&location=${showFloorPopup}`}
-                                        className="w-full flex items-center justify-center gap-2 bg-[#2546A8] hover:bg-[#1A255C] text-white font-bold py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5"
+                                    <button
+                                        onClick={() => handleEnroll(selectedPackage!)}
+                                        disabled={!!addingToCart}
+                                        className="w-full font-bold flex items-center justify-center gap-2 py-4 px-6 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-xl transition-all shadow-lg shadow-purple-500/25 disabled:opacity-70"
                                     >
-                                        Complete Checkout <ArrowRight className="w-5 h-5" />
-                                    </Link>
+                                        {addingToCart ? (
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                        ) : (
+                                            <>Proceed to Secure Checkout <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></>
+                                        )}
+                                    </button>
                                     <button
                                         onClick={() => {
                                             setShowFloorPopup(null);

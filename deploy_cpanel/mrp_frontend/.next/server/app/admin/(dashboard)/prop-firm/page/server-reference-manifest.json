@@ -1,0 +1,50 @@
+{
+  "node": {
+    "00913f5982e0644852ab617d1d68b1a085b6a6dc4d": {
+      "workers": {
+        "app/admin/(dashboard)/prop-firm/page": {
+          "moduleId": 32424,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/prop-firm/page": "action-browser"
+      },
+      "exportedName": "getPromoBannerSettings",
+      "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+    },
+    "001ae79117c5582ace499dddb2720610d4afe540a7": {
+      "workers": {
+        "app/admin/(dashboard)/prop-firm/page": {
+          "moduleId": 32424,
+          "async": false,
+          "exportedName": "getPropFirmSettings",
+          "filename": "mrp_frontend/app/actions/prop-firm-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/prop-firm/page": "action-browser"
+      },
+      "exportedName": "getPropFirmSettings",
+      "filename": "mrp_frontend/app/actions/prop-firm-settings.ts"
+    },
+    "4095540ff2961355dd11bb1904f7e044caf6fc8f16": {
+      "workers": {
+        "app/admin/(dashboard)/prop-firm/page": {
+          "moduleId": 32424,
+          "async": false,
+          "exportedName": "updatePropFirmSettings",
+          "filename": "mrp_frontend/app/actions/prop-firm-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/prop-firm/page": "action-browser"
+      },
+      "exportedName": "updatePropFirmSettings",
+      "filename": "mrp_frontend/app/actions/prop-firm-settings.ts"
+    }
+  },
+  "edge": {}
+}

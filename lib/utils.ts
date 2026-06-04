@@ -80,3 +80,16 @@ export function relativizeMediaUrl(url: string | undefined | null): string {
 
     return url;
 }
+
+/**
+ * Truncate a string by words
+ * @param text The text to truncate
+ * @param limit The maximum number of words
+ * @returns The truncated string
+ */
+export function truncateWords(text: string | undefined | null, limit: number = 25): string {
+    if (!text) return "";
+    const words = text.split(/\s+/).filter(w => w.length > 0);
+    if (words.length <= limit) return text;
+    return words.slice(0, limit).join(" ") + "...";
+}

@@ -19,8 +19,8 @@ import { StepMT5Details } from "./steps/StepMT5Details";
 import { StepAdditionalInfo } from "./steps/StepAdditionalInfo";
 import { StepLegal } from "./steps/StepLegal";
 import { StepPayment } from "./steps/StepPayment";
-import { StepCryptoPaymentPending } from "./steps/StepCryptoPaymentPending";
 import { StepSuccess } from "./steps/StepSuccess";
+import { PricingTier } from "@/app/actions/prop-firm-settings";
 
 export interface CheckoutData {
     // Pricing info
@@ -84,15 +84,58 @@ function CheckoutWizardContent() {
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [orderId, setOrderId] = useState<string>("");
-    const [cryptoPayment, setCryptoPayment] = useState<any>(null);
+    const [isCheckingEntry, setIsCheckingEntry] = useState(true);
+    const [pricingTiers, setPricingTiers] = useState<Record<string, PricingTier>>({});
 
-    // Parse URL params initially to set up data
+    // 1. Restore state from sessionStorage on mount
+    useEffect(() => {
+        const saved = sessionStorage.getItem('checkout_wizard_state');
+        if (saved) {
+            try {
+                const { data: savedData, currentStep: savedStep } = JSON.parse(saved);
+                setData(savedData);
+                setCurrentStep(savedStep);
+            } catch (e) {
+                console.error('Failed to restore checkout wizard state:', e);
+            }
+        }
+    }, []);
+
+    // 2. Persist state to sessionStorage on changes
+    useEffect(() => {
+        if (currentStep > 1 || data.propFirm !== "" || data.accountSize !== 0) {
+            sessionStorage.setItem('checkout_wizard_state', JSON.stringify({ data, currentStep }));
+        }
+    }, [data, currentStep]);
+    // 3. Main Init: URL Parsing & Entry Guard
     useEffect(() => {
         const planParam = searchParams.get('plan');
         const challengeParam = searchParams.get('challenge') || '';
         const typeParam = searchParams.get('type') || '';
         const sizeParam = searchParams.get('sizeVal');
         const priceParam = searchParams.get('price');
+
+        const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+        const saved = typeof window !== 'undefined' ? sessionStorage.getItem('checkout_wizard_state') : null;
+
+        // --- ENFORCEMENT GUARDS ---
+
+        // A. Direct URL access prevention
+        if (!planParam && !saved) {
+            console.log("No plan or saved session found. Redirecting to pass-funded-accounts.");
+            router.push('/pass-funded-accounts');
+            return;
+        }
+
+        // B. Authentication Check
+        if (!token) {
+            toast.error("Please login to continue with checkout");
+            const currentUrl = encodeURIComponent(window.location.pathname + window.location.search);
+            router.push(`/login?redirect=${currentUrl}`);
+            return;
+        }
+
+        // --- DATA INITIALIZATION ---
 
         if (planParam && priceParam && sizeParam) {
             const parsedSize = parseInt(sizeParam, 10);
@@ -118,42 +161,47 @@ function CheckoutWizardContent() {
             }));
 
             // Step Skipping Logic: Skip to StepTimelineRules (Step 6)
-            // The steps are: 1(Firm), 2(Type), 3(Scope), 4(Size), 5(Package), 6(Timeline)
             setCurrentStep(6);
         }
 
-        // Fetch discount settings dynamically
+        // Fetch settings dynamically
         import('@/app/actions/prop-firm-settings').then(module => {
             module.getPropFirmSettings().then(settings => {
-                if (settings && settings.discountActive) {
-                    setData(prev => ({
-                        ...prev,
-                        discountPercentage: settings.discountPercentage || 0,
-                    }));
+                if (settings) {
+                    if (settings.discountActive) {
+                        setData(prev => ({
+                            ...prev,
+                            discountPercentage: settings.discountPercentage || 0,
+                        }));
+                    }
+                    if (settings.pricingTiers) {
+                        setPricingTiers(settings.pricingTiers);
+                    }
                 }
             });
         });
 
-        // We can fetch VAT configuration dynamically if available, otherwise default to 0
-        setData(prev => ({ ...prev, vatPercentage: 0 }));
-
-        // Authentication Check
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            toast.error("Please login to continue with checkout");
-            const currentUrl = encodeURIComponent(window.location.pathname + window.location.search);
-            router.push(`/login?redirect=${currentUrl}`);
-        }
-
+        // We are good to go
+        setIsCheckingEntry(false);
     }, [searchParams, router]);
 
     // Recalculate price dynamically if user modifies package options in wizard
     useEffect(() => {
-        const calculatedPrice = getCheckoutPrice(data.packageType, data.challengeType, data.scope, data.accountSize);
-        if (calculatedPrice > 0 && calculatedPrice !== data.price) {
-            setData(prev => ({ ...prev, price: calculatedPrice }));
+        const planKey = data.packageType.toLowerCase().includes('guarantee') ? 'guaranteed' : 'standard';
+        const challengeKey = data.challengeType.toLowerCase().includes('1-step') ? '1step' : '2step';
+        const scopeKey = data.scope === "Step 1 Only" ? "step1" : "full";
+        const tierKey = `${planKey}-${challengeKey}-${scopeKey}-${data.accountSize}`;
+
+        const dynamicPrice = pricingTiers[tierKey]?.price;
+        if (dynamicPrice) {
+            setData(prev => ({ ...prev, price: dynamicPrice }));
+        } else {
+            const calculatedPrice = getCheckoutPrice(data.packageType, data.challengeType, data.scope, data.accountSize);
+            if (calculatedPrice > 0 && calculatedPrice !== data.price) {
+                setData(prev => ({ ...prev, price: calculatedPrice }));
+            }
         }
-    }, [data.packageType, data.challengeType, data.scope, data.accountSize]);
+    }, [data.packageType, data.challengeType, data.scope, data.accountSize, pricingTiers]);
 
     const updateData = (newData: Partial<CheckoutData>) => {
         setData(prev => ({ ...prev, ...newData }));
@@ -216,25 +264,50 @@ function CheckoutWizardContent() {
 
             // 4. Handle Payment Flow
             if (data.paymentMethod === "crypto") {
-                const paymentResponse = await cryptoPaymentService.createDirectPayment({
+                const invoiceResponse = await cryptoPaymentService.createInvoice({
                     price_amount: finalTotal,
                     price_currency: "usd",
-                    pay_currency: data.cryptoCurrency || "usdttrc20",
                     order_id: `PROP-${regId}`,
-                    order_description: `Prop Firm Challenge - ${data.propFirm} ${data.accountSize}`
+                    order_description: `Prop Firm Challenge - ${data.propFirm} ${data.accountSize}`,
+                    success_url: `${window.location.origin}/pass-funded-accounts/checkout?step=success&order_id=PROP-${regId}`,
+                    cancel_url: window.location.href
                 });
-                setCryptoPayment(paymentResponse);
-                setOrderId(`PROP-${regId}`);
-                setCurrentStep(12); // Move to Crypto Pending screen
-            } else {
-                // For Card/Sellar, the link is currently handled by StepPayment or we could generate it here
-                // If the backend had a dedicated Sellar link generator, we'd call it here.
-                // For now, we'll mark as registration created and show success or move to a summary
-                setOrderId(`PROP-${regId}`);
-                toast.success("Registration created! Redirecting to payment...");
 
-                // If we have a dynamic link from backend in the future, we'd use it here.
-                // Registration is done, UI can now show the success or the Sellar link if not already clicked.
+                // Clear state on success
+                sessionStorage.removeItem('checkout_wizard_state');
+
+                if (invoiceResponse.invoice_url) {
+                    window.location.href = invoiceResponse.invoice_url;
+                    return;
+                }
+
+                // Fallback if no URL
+                setOrderId(`PROP-${regId}`);
+                setCurrentStep(13);
+            } else {
+                // Handle Card/Seller Redirection
+                const planKey = data.packageType.toLowerCase().includes('guarantee') ? 'guaranteed' : 'standard';
+                const challengeKey = data.challengeType.toLowerCase().includes('1-step') ? '1step' : '2step';
+                const scopeKey = data.scope === "Step 1 Only" ? "step1" : "full";
+                const tierKey = `${planKey}-${challengeKey}-${scopeKey}-${data.accountSize}`;
+                let finalSellerLink = pricingTiers[tierKey]?.sellerLink?.trim();
+
+                // Clear state on success
+                sessionStorage.removeItem('checkout_wizard_state');
+
+                if (finalSellerLink) {
+                    if (!finalSellerLink.startsWith('http') && !finalSellerLink.startsWith('/')) {
+                        finalSellerLink = 'https://' + finalSellerLink;
+                    }
+                    toast.success("Registration created! Redirecting to payment...");
+                    setTimeout(() => {
+                        window.location.href = finalSellerLink;
+                    }, 1500);
+                    return;
+                }
+
+                setOrderId(`PROP-${regId}`);
+                toast.success("Registration created successfully!");
                 setCurrentStep(13); // Final success
             }
 
@@ -261,37 +334,42 @@ function CheckoutWizardContent() {
     const totalVisibleSteps = 13 - skippedSteps; // 13 total steps in our flow
     const visibleCurrentStep = currentStep > skippedSteps ? currentStep - skippedSteps : 1;
 
+    if (isCheckingEntry) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-slate-900 mb-4" />
+                <p className="text-slate-500 font-bold text-sm uppercase tracking-widest animate-pulse">Verifying Access...</p>
+            </div>
+        );
+    }
+
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 py-12 px-4 relative overflow-hidden font-sans flex items-center justify-center selection:bg-indigo-100 selection:text-indigo-900">
+        <div className="min-h-screen sm:min-h-screen bg-slate-50 text-slate-900 pt-0 pb-2 sm:py-12 px-2 sm:px-4 relative overflow-hidden font-sans flex items-start sm:items-center justify-center selection:bg-indigo-100 selection:text-indigo-900">
             {/* Ambient Background Elements */}
             <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden">
                 <div className="absolute top-0 left-0 w-2/3 h-2/3 rounded-full bg-indigo-500/[0.03] blur-[120px]" />
                 <div className="absolute bottom-0 right-0 w-2/3 h-2/3 rounded-full bg-emerald-500/[0.03] blur-[120px]" />
             </div>
 
-            <div className="w-full max-w-3xl relative z-10">
+            <div className="w-full max-w-3xl relative z-10 flex flex-col h-full max-h-[96vh] sm:max-h-none">
                 {/* Progress Indicators */}
                 {currentStep < 13 && (
-                    <div className="bg-white/80 backdrop-blur-md rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/50 flex flex-col sm:flex-row sm:items-center justify-between px-6 py-6 md:px-8 mb-6 transition-all duration-300">
-                        <div className="flex flex-col gap-1.5 w-full sm:w-auto mb-4 sm:mb-0">
-                            <div className="text-[10px] font-black tracking-[0.15em] text-indigo-600 uppercase">
-                                Progress • Step {visibleCurrentStep} of {totalVisibleSteps}
+                    <div className="w-full bg-white/80 backdrop-blur-md rounded-none sm:rounded-[2rem] shadow-[0_4px_15px_rgb(0,0,0,0.02)] border-b sm:border border-slate-100/50 flex flex-row items-center justify-between px-3 py-1.5 sm:px-8 sm:py-6 mb-1 sm:mb-6 transition-all duration-300">
+                        <div className="flex flex-col gap-0.5 w-full sm:w-auto">
+                            <div className="text-[9px] sm:text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">
+                                Step {visibleCurrentStep}/{totalVisibleSteps}
                             </div>
-                            <div className="w-full sm:w-64 h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1 shadow-inner">
+                            <div className="w-full sm:w-64 h-1 bg-slate-100 rounded-full overflow-hidden mt-0.5 shadow-inner">
                                 <div
                                     className="h-full bg-slate-900 transition-all duration-700 ease-out rounded-full relative"
                                     style={{ width: `${(visibleCurrentStep / totalVisibleSteps) * 100}%` }}
                                 >
-                                    <div className="absolute top-0 right-0 bottom-0 w-10 bg-gradient-to-r from-transparent to-white/20"></div>
                                 </div>
                             </div>
                         </div>
                         {currentStep > 1 && !(currentStep === 6 && searchParams.get('plan')) && (
-                            <button onClick={handleBack} className="text-slate-500 hover:text-[#2563EB] transition-colors flex items-center font-medium group">
-                                <svg className="w-5 h-5 mr-1 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                </svg>
-                                Back
+                            <button onClick={handleBack} className="text-slate-500 hover:text-slate-900 transition-colors flex items-center font-bold group ml-4">
+                                <span className="text-[10px] uppercase tracking-wider">Back</span>
                             </button>
                         )}
                     </div>
@@ -308,8 +386,7 @@ function CheckoutWizardContent() {
                 {currentStep === 8 && <StepMT5Details data={data} updateData={updateData} onNext={handleNext} onBack={handleBack} />}
                 {currentStep === 9 && <StepAdditionalInfo data={data} updateData={updateData} onNext={handleNext} onBack={handleBack} />}
                 {currentStep === 10 && <StepLegal data={data} updateData={updateData} onNext={handleNext} onBack={handleBack} />}
-                {currentStep === 11 && <StepPayment data={data} updateData={updateData} onSubmit={handleSubmit} onBack={handleBack} loading={loading} />}
-                {currentStep === 12 && cryptoPayment && <StepCryptoPaymentPending payment={cryptoPayment} onComplete={() => setCurrentStep(13)} />}
+                {currentStep === 11 && <StepPayment data={data} updateData={updateData} onSubmit={handleSubmit} onBack={handleBack} loading={loading} pricingTiers={pricingTiers} />}
                 {currentStep === 13 && <StepSuccess orderId={orderId} />}
             </div>
         </div>

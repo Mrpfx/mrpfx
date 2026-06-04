@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import ResourceAuthForm from '@/components/resource/ResourceAuthForm';
 
 export default function RobotsPage() {
@@ -31,7 +32,9 @@ export default function RobotsPage() {
 
             {/* Registration Form Section */}
             <div className="container mx-auto px-4 my-[50px] relative z-20">
-                <ResourceAuthForm title="Robots" />
+                <Suspense fallback={<div />}>
+                    <ResourceAuthForm title="Robots" />
+                </Suspense>
             </div>
         </div>
     );

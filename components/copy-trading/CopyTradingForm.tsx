@@ -5,6 +5,10 @@ import { User, Lock, Server, Building2, CheckCircle2, Loader2, ShieldCheck, X } 
 import { tradersService } from '@/lib/traders';
 import { toast } from 'react-hot-toast';
 import { createPortal } from 'react-dom';
+import { getCopyTradingSettings, CopyTradingSettings } from '@/app/actions/copy-trading-settings';
+import ConfirmBeforePaymentModal from '../checkout/ConfirmBeforePaymentModal';
+import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
+import SuccessModal from '../checkout/SuccessModal';
 
 export default function CopyTradingForm({ onSuccess }: { onSuccess?: () => void }) {
     const [broker, setBroker] = useState('');
@@ -13,35 +17,29 @@ export default function CopyTradingForm({ onSuccess }: { onSuccess?: () => void 
     const [server, setServer] = useState('');
     const [loading, setLoading] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
+    const [settings, setSettings] = useState<CopyTradingSettings>({ monthlyFee: 399, placeholder: 'Monthly Subscription Fee', productSlug: 'copy-trading-monthly' });
+
+    const { withAuth } = useRequireAuth();
+
+    React.useEffect(() => {
+        getCopyTradingSettings().then(setSettings);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
-        try {
-            const result = await tradersService.connectCopyTrading({
-                accountId,
-                password,
-                server
-            });
 
-            if (result.success) {
-                setSuccessMessage(result.message);
-                setShowSuccessModal(true);
-                // Clear form
-                setAccountId('');
-                setPassword('');
-                setServer('');
-                setBroker('');
-                if (onSuccess) onSuccess();
-            } else {
-                toast.error(result.message);
+        const formData = { accountId, password, server, broker };
+
+        withAuth(async () => {
+            if (!accountId || !password || !server || !broker) {
+                toast.error("Please fill in all MT5 account details");
+                return;
             }
-        } catch (error) {
-            toast.error("An unexpected error occurred. Please try again.");
-        } finally {
-            setLoading(false);
-        }
+
+            setShowConfirmModal(true);
+        }, { key: 'connect-copy-trading', data: formData });
     };
 
     return (
@@ -111,6 +109,15 @@ export default function CopyTradingForm({ onSuccess }: { onSuccess?: () => void 
                     />
                 </div>
 
+                {/* Dynamic Fee Display */}
+                <div className="bg-blue-50/50 rounded-2xl p-4 border border-blue-100 flex flex-col items-center group hover:bg-blue-50 transition-all duration-300">
+                    <span className="text-[10px] uppercase font-bold text-blue-600/70 tracking-widest mb-1.5">Monthly Subscription</span>
+                    <div className="flex items-baseline gap-1">
+                        <span className="text-2xl font-black text-blue-900">${settings.monthlyFee.toLocaleString()}</span>
+                        <span className="text-blue-600/50 font-bold text-sm">/ month</span>
+                    </div>
+                </div>
+
                 {/* Submit Button */}
                 <button
                     type="submit"
@@ -124,51 +131,42 @@ export default function CopyTradingForm({ onSuccess }: { onSuccess?: () => void 
                         </>
                     ) : (
                         <>
-                            <span className="text-xs md:text-lg">Activate Auto Copy Trading</span>
+                            <span className="text-xs md:text-lg">Apply for Copy Trading</span>
                             <CheckCircle2 className="h-4 w-4 md:h-5 md:w-5 opacity-80 group-hover:scale-110 transition-transform flex-shrink-0" />
                         </>
                     )}
                 </button>
             </form>
 
-            {showSuccessModal && typeof document !== 'undefined' && createPortal(
-                <SuccessModal
-                    isOpen={showSuccessModal}
-                    onClose={() => setShowSuccessModal(false)}
-                    message={successMessage}
-                />,
-                document.body
-            )}
-        </div>
-    );
-}
+            <ConfirmBeforePaymentModal
+                isOpen={showConfirmModal}
+                onClose={() => setShowConfirmModal(false)}
+                mode="copy-trading"
+                onSuccess={(msg) => {
+                    setSuccessMessage(msg);
+                    setShowSuccessModal(true);
+                    // Reset form
+                    setAccountId('');
+                    setPassword('');
+                    setServer('');
+                    setBroker('');
+                    if (onSuccess) onSuccess();
+                }}
+                data={{
+                    accountId,
+                    password,
+                    server,
+                    broker,
+                    fee: settings.monthlyFee,
+                    slug: settings.productSlug
+                }}
+            />
 
-function SuccessModal({ isOpen, onClose, message }: { isOpen: boolean; onClose: () => void; message: string }) {
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 md:p-10 text-center animate-in zoom-in-95 duration-300 relative">
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                    <X className="w-5 h-5" />
-                </button>
-                <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-8 border border-emerald-100">
-                    <ShieldCheck className="w-12 h-12 text-emerald-500" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3 font-outfit">Connection Successful!</h3>
-                <p className="text-gray-600 mb-8 md:mb-10 leading-relaxed text-[15px] font-medium">
-                    {message}
-                </p>
-                <button
-                    onClick={onClose}
-                    className="w-full bg-[#00A859] hover:bg-[#00914d] text-white font-bold py-4 rounded-xl transition-all shadow-md active:scale-[0.98] text-[16px] shadow-emerald-200"
-                >
-                    Got it, thanks!
-                </button>
-            </div>
+            <SuccessModal
+                isOpen={showSuccessModal}
+                onClose={() => setShowSuccessModal(false)}
+                message={successMessage}
+            />
         </div>
     );
 }

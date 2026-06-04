@@ -12,11 +12,13 @@ import TradingStrategy from './TradingStrategy';
 import NewsletterSection from '../shared/NewsletterSection';
 import OfferPopup from '../shared/OfferPopup';
 import MentorshipModal from './MentorshipModal';
+import ComingSoonModal from '../shared/ComingSoonModal';
 
 export default function HomePage() {
     const [showMentorshipPopup, setShowMentorshipPopup] = useState(false);
     const [showVipPopup, setShowVipPopup] = useState(false);
     const [showFreePopup, setShowFreePopup] = useState(false);
+    const [showComingSoon, setShowComingSoon] = useState(false);
 
     const mentorshipItems = [
         { label: "Standard Mentorship", href: "/mentorship-course", color: "purple" as const },
@@ -42,6 +44,7 @@ export default function HomePage() {
             <Hero onMentorshipClick={() => setShowMentorshipPopup(true)} />
             <AccessSection
                 onMentorshipClick={() => setShowMentorshipPopup(true)}
+                onTradeJournalClick={() => setShowComingSoon(true)}
             />
             {/* <Services
                 onMentorshipClick={() => setShowMentorshipPopup(true)}
@@ -55,8 +58,8 @@ export default function HomePage() {
             /> */}
             {/* <MentorshipPreview /> */}
             <Testimonials />
-            <Community />
-            <TradingStrategy />
+            {/* <Community /> */}
+            {/* <TradingStrategy /> */}
             <NewsletterSection />
 
             <MentorshipModal
@@ -72,6 +75,10 @@ export default function HomePage() {
                 isOpen={showFreePopup}
                 onClose={() => setShowFreePopup(false)}
                 items={freeItems}
+            />
+            <ComingSoonModal
+                isOpen={showComingSoon}
+                onClose={() => setShowComingSoon(false)}
             />
         </main>
     );

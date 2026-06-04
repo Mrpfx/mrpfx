@@ -25,7 +25,7 @@ This guide outlines the steps to deploy the `mrp_frontend` application to a cPan
 2. Navigate to the **Application root** folder you created in Step 1.
 3. Upload the `mrp_frontend_cpanel_deploy.zip` file.
 4. **Right-click** the uploaded file and select **"Extract"**.
-5. Once extracted, you should see the `server.js` file, `.next` folder, `public` folder, and `node_modules` folder in the root.
+5. Once extracted, you should see the `server.js` file, `mrp_frontend` folder, `public` folder, and `node_modules` folder in the root.
 
 ### 3. Finalize and Start
 1. Go back to the **"Setup Node.js App"** page.
@@ -35,6 +35,6 @@ This guide outlines the steps to deploy the `mrp_frontend` application to a cPan
 5. Visit your Application URL to verify the deployment.
 
 ## Troubleshooting
-- **404 Errors on Static Files**: Ensure the `public` and `.next/static` folders were correctly extracted into the application root.
+- **404 Errors on Static Files**: Ensure the `public` and `mrp_frontend/.next/static` folders were correctly extracted into the application root.
 - **Port Conflicts**: cPanel's Passenger module handles the port automatically; do not specify a port in `server.js`.
-- **Environment Variables**: The `.env.production` file is included in the zip and should be automatically loaded by Next.js.
+- **Environment Variables**: The `.env` file is included in the zip and contains the production settings. You can also edit it directly in the File Manager.

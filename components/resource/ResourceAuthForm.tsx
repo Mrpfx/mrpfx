@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { authService, User } from '@/lib/auth';
 import { Loader2 } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface ResourceAuthFormProps {
     title: string;
@@ -14,6 +15,9 @@ const ResourceAuthForm = ({ title }: ResourceAuthFormProps) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectPath = searchParams.get('redirect') || '/dashboard';
 
     // Form fields
     const [fullName, setFullName] = useState('');
@@ -64,7 +68,11 @@ const ResourceAuthForm = ({ title }: ResourceAuthFormProps) => {
                 // After login, authService dispatches auth-change which updates user state
             }
         } catch (err: any) {
-            setError(err.response?.data?.message || err.message || 'Authentication failed. Please try again.');
+            if (err.response?.status === 409) {
+                setError('An account with this email already exists. Please try logging in or resetting your password.');
+            } else {
+                setError(err.response?.data?.message || err.message || 'Authentication failed. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
@@ -101,8 +109,11 @@ const ResourceAuthForm = ({ title }: ResourceAuthFormProps) => {
             )}
 
             {success && (
-                <div className="bg-green-50 text-green-600 p-3 rounded mb-6 text-sm border border-green-100">
-                    {success}
+                <div className="bg-green-50 text-green-700 p-4 rounded mb-6 text-[15px] border border-green-200">
+                    <p className="mb-1.5">{success}</p>
+                    <p className="font-bold text-red-600 drop-shadow-sm">
+                        Please check your spam or junk folder if you do not see the email in your inbox.
+                    </p>
                 </div>
             )}
 

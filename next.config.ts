@@ -92,7 +92,7 @@ const nextConfig: NextConfig = {
             // Basic CSP to prevent obvious XSS but allow necessary scripts/styles
             // Adjust 'self' and domains as needed based on actual usage (e.g. Google Fonts, Analytics)
             key: 'Content-Security-Policy',
-            value: "default-src 'self' http: https:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google-analytics.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: http: https:; connect-src 'self' http: https:; frame-src 'self' https:;"
+            value: "default-src 'self' http: https:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.google-analytics.com https://www.googletagmanager.com https://embed.tawk.to https://*.tawk.to https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://embed.tawk.to https://*.tawk.to; font-src 'self' data: https://fonts.gstatic.com https://embed.tawk.to; img-src 'self' data: http: https:; connect-src 'self' http: https: wss://*.tawk.to; frame-src 'self' https: https://*.tawk.to;"
           }
         ]
       }

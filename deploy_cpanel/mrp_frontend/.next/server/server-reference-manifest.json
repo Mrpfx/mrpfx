@@ -1,0 +1,1132 @@
+{
+  "node": {
+    "00913f5982e0644852ab617d1d68b1a085b6a6dc4d": {
+      "workers": {
+        "app/[slug]/page": {
+          "moduleId": 80463,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/_not-found/page": {
+          "moduleId": 77169,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/account-management/page": {
+          "moduleId": 80120,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/account-management/trader/[id]/page": {
+          "moduleId": 30972,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/account-management/page": {
+          "moduleId": 87353,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/books/[bookId]/page": {
+          "moduleId": 98813,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/books/add/page": {
+          "moduleId": 81189,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/books/page": {
+          "moduleId": 63110,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/categories/page": {
+          "moduleId": 17175,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/comments/page": {
+          "moduleId": 94598,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/copy-trading/page": {
+          "moduleId": 11785,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/coupons/page": {
+          "moduleId": 97236,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/courses/[courseId]/page": {
+          "moduleId": 81487,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/courses/[courseId]/submissions/page": {
+          "moduleId": 17059,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/courses/add/page": {
+          "moduleId": 15731,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/courses/page": {
+          "moduleId": 15074,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/email-marketing/page": {
+          "moduleId": 77274,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/forms/[formId]/entries/page": {
+          "moduleId": 10239,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/forms/[formId]/page": {
+          "moduleId": 83168,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/forms/new/page": {
+          "moduleId": 775,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/forms/page": {
+          "moduleId": 70640,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/links/page": {
+          "moduleId": 81970,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/media/page": {
+          "moduleId": 46699,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/members/page": {
+          "moduleId": 71046,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/orders/[orderId]/page": {
+          "moduleId": 24546,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/orders/add/page": {
+          "moduleId": 10682,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/orders/page": {
+          "moduleId": 76202,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/page": {
+          "moduleId": 62282,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/pages/[pageId]/page": {
+          "moduleId": 71075,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/pages/add/page": {
+          "moduleId": 30423,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/pages/page": {
+          "moduleId": 12847,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/posts/[postId]/page": {
+          "moduleId": 93357,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/posts/add/page": {
+          "moduleId": 81467,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/posts/page": {
+          "moduleId": 68536,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/products/[productId]/page": {
+          "moduleId": 48200,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/products/add/page": {
+          "moduleId": 43434,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/products/page": {
+          "moduleId": 26854,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/prop-firm/page": {
+          "moduleId": 32424,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/reports/page": {
+          "moduleId": 36018,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 96555,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/settings/security/page": {
+          "moduleId": 12027,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/signals/[signalId]/page": {
+          "moduleId": 44630,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/signals/add/page": {
+          "moduleId": 41158,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/signals/page": {
+          "moduleId": 55960,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/submissions/[submissionId]/page": {
+          "moduleId": 20619,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/tags/page": {
+          "moduleId": 3778,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/traders/[trader_id]/page": {
+          "moduleId": 23041,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/traders/add/page": {
+          "moduleId": 80441,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/traders/edit/[trader_id]/page": {
+          "moduleId": 73541,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/traders/page": {
+          "moduleId": 49070,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/trading-tools/[toolId]/page": {
+          "moduleId": 1335,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/trading-tools/add/page": {
+          "moduleId": 7264,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/trading-tools/page": {
+          "moduleId": 26680,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/users/[userId]/page": {
+          "moduleId": 84220,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/users/add/page": {
+          "moduleId": 63964,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/users/page": {
+          "moduleId": 87404,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/videos/[videoId]/page": {
+          "moduleId": 15501,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/videos/add/page": {
+          "moduleId": 9425,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/(dashboard)/videos/page": {
+          "moduleId": 96541,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/admin/login/page": {
+          "moduleId": 36096,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/all-vip-resources/page": {
+          "moduleId": 34909,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/blog/[slug]/page": {
+          "moduleId": 2874,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/blog/page": {
+          "moduleId": 59510,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/book/[id]/page": {
+          "moduleId": 3006,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/cart/page": {
+          "moduleId": 94926,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/checkout/page": {
+          "moduleId": 52647,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/copy-trading/page": {
+          "moduleId": 16532,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/courses/[slug]/lesson/[lessonId]/page": {
+          "moduleId": 97655,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/courses/[slug]/page": {
+          "moduleId": 24110,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/courses/[slug]/quiz/[quizId]/page": {
+          "moduleId": 62302,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/courses/page": {
+          "moduleId": 89704,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 8221,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/forex-books/page": {
+          "moduleId": 2815,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/forgot-password/page": {
+          "moduleId": 66197,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/free-robots/page": {
+          "moduleId": 94202,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/free-signals-group/page": {
+          "moduleId": 89849,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/free-trading-indicators/page": {
+          "moduleId": 70014,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/login/page": {
+          "moduleId": 67771,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/mentorship-course-100/page": {
+          "moduleId": 73163,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/mentorship-course/page": {
+          "moduleId": 23065,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/my-courses/page": {
+          "moduleId": 7384,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/my-orders/[orderId]/page": {
+          "moduleId": 14744,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/my-orders/page": {
+          "moduleId": 29349,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/page": {
+          "moduleId": 13047,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/pass-funded-accounts/checkout/page": {
+          "moduleId": 48186,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/pass-funded-accounts/page": {
+          "moduleId": 72930,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/physical-classes/page": {
+          "moduleId": 64252,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/privacy-policy/page": {
+          "moduleId": 30425,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/private-mentorship/page": {
+          "moduleId": 76887,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/product/[slug]/page": {
+          "moduleId": 64494,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/rent-vps-hosting/page": {
+          "moduleId": 7383,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/reset-password/page": {
+          "moduleId": 77606,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/resource_category/free-robots-indicators-seminars/page": {
+          "moduleId": 38997,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/resource_category/indicator/page": {
+          "moduleId": 95828,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/resource_category/robot/page": {
+          "moduleId": 60063,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/risk-calculator/page": {
+          "moduleId": 71252,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/shop/page": {
+          "moduleId": 2462,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/sign-up/page": {
+          "moduleId": 88084,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/support/page": {
+          "moduleId": 89821,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/terms-and-conditions/page": {
+          "moduleId": 992,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/trading-tool/[id]/page": {
+          "moduleId": 15058,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/videos/page": {
+          "moduleId": 58414,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/vip-signals-group/page": {
+          "moduleId": 23609,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/vip-trading-bots/page": {
+          "moduleId": 55928,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        },
+        "app/vip-trading-indicators/page": {
+          "moduleId": 87654,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        }
+      },
+      "layer": {
+        "app/[slug]/page": "action-browser",
+        "app/_not-found/page": "action-browser",
+        "app/account-management/page": "action-browser",
+        "app/account-management/trader/[id]/page": "action-browser",
+        "app/admin/(dashboard)/account-management/page": "action-browser",
+        "app/admin/(dashboard)/books/[bookId]/page": "action-browser",
+        "app/admin/(dashboard)/books/add/page": "action-browser",
+        "app/admin/(dashboard)/books/page": "action-browser",
+        "app/admin/(dashboard)/categories/page": "action-browser",
+        "app/admin/(dashboard)/comments/page": "action-browser",
+        "app/admin/(dashboard)/copy-trading/page": "action-browser",
+        "app/admin/(dashboard)/coupons/page": "action-browser",
+        "app/admin/(dashboard)/courses/[courseId]/page": "action-browser",
+        "app/admin/(dashboard)/courses/[courseId]/submissions/page": "action-browser",
+        "app/admin/(dashboard)/courses/add/page": "action-browser",
+        "app/admin/(dashboard)/courses/page": "action-browser",
+        "app/admin/(dashboard)/email-marketing/page": "action-browser",
+        "app/admin/(dashboard)/forms/[formId]/entries/page": "action-browser",
+        "app/admin/(dashboard)/forms/[formId]/page": "action-browser",
+        "app/admin/(dashboard)/forms/new/page": "action-browser",
+        "app/admin/(dashboard)/forms/page": "action-browser",
+        "app/admin/(dashboard)/links/page": "action-browser",
+        "app/admin/(dashboard)/media/page": "action-browser",
+        "app/admin/(dashboard)/members/page": "action-browser",
+        "app/admin/(dashboard)/orders/[orderId]/page": "action-browser",
+        "app/admin/(dashboard)/orders/add/page": "action-browser",
+        "app/admin/(dashboard)/orders/page": "action-browser",
+        "app/admin/(dashboard)/page": "action-browser",
+        "app/admin/(dashboard)/pages/[pageId]/page": "action-browser",
+        "app/admin/(dashboard)/pages/add/page": "action-browser",
+        "app/admin/(dashboard)/pages/page": "action-browser",
+        "app/admin/(dashboard)/posts/[postId]/page": "action-browser",
+        "app/admin/(dashboard)/posts/add/page": "action-browser",
+        "app/admin/(dashboard)/posts/page": "action-browser",
+        "app/admin/(dashboard)/products/[productId]/page": "action-browser",
+        "app/admin/(dashboard)/products/add/page": "action-browser",
+        "app/admin/(dashboard)/products/page": "action-browser",
+        "app/admin/(dashboard)/prop-firm/page": "action-browser",
+        "app/admin/(dashboard)/reports/page": "action-browser",
+        "app/admin/(dashboard)/settings/page": "action-browser",
+        "app/admin/(dashboard)/settings/security/page": "action-browser",
+        "app/admin/(dashboard)/signals/[signalId]/page": "action-browser",
+        "app/admin/(dashboard)/signals/add/page": "action-browser",
+        "app/admin/(dashboard)/signals/page": "action-browser",
+        "app/admin/(dashboard)/submissions/[submissionId]/page": "action-browser",
+        "app/admin/(dashboard)/tags/page": "action-browser",
+        "app/admin/(dashboard)/traders/[trader_id]/page": "action-browser",
+        "app/admin/(dashboard)/traders/add/page": "action-browser",
+        "app/admin/(dashboard)/traders/edit/[trader_id]/page": "action-browser",
+        "app/admin/(dashboard)/traders/page": "action-browser",
+        "app/admin/(dashboard)/trading-tools/[toolId]/page": "action-browser",
+        "app/admin/(dashboard)/trading-tools/add/page": "action-browser",
+        "app/admin/(dashboard)/trading-tools/page": "action-browser",
+        "app/admin/(dashboard)/users/[userId]/page": "action-browser",
+        "app/admin/(dashboard)/users/add/page": "action-browser",
+        "app/admin/(dashboard)/users/page": "action-browser",
+        "app/admin/(dashboard)/videos/[videoId]/page": "action-browser",
+        "app/admin/(dashboard)/videos/add/page": "action-browser",
+        "app/admin/(dashboard)/videos/page": "action-browser",
+        "app/admin/login/page": "action-browser",
+        "app/all-vip-resources/page": "action-browser",
+        "app/blog/[slug]/page": "action-browser",
+        "app/blog/page": "action-browser",
+        "app/book/[id]/page": "action-browser",
+        "app/cart/page": "action-browser",
+        "app/checkout/page": "action-browser",
+        "app/copy-trading/page": "action-browser",
+        "app/courses/[slug]/lesson/[lessonId]/page": "action-browser",
+        "app/courses/[slug]/page": "action-browser",
+        "app/courses/[slug]/quiz/[quizId]/page": "action-browser",
+        "app/courses/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/forex-books/page": "action-browser",
+        "app/forgot-password/page": "action-browser",
+        "app/free-robots/page": "action-browser",
+        "app/free-signals-group/page": "action-browser",
+        "app/free-trading-indicators/page": "action-browser",
+        "app/login/page": "action-browser",
+        "app/mentorship-course-100/page": "action-browser",
+        "app/mentorship-course/page": "action-browser",
+        "app/my-courses/page": "action-browser",
+        "app/my-orders/[orderId]/page": "action-browser",
+        "app/my-orders/page": "action-browser",
+        "app/page": "action-browser",
+        "app/pass-funded-accounts/checkout/page": "action-browser",
+        "app/pass-funded-accounts/page": "action-browser",
+        "app/physical-classes/page": "action-browser",
+        "app/privacy-policy/page": "action-browser",
+        "app/private-mentorship/page": "action-browser",
+        "app/product/[slug]/page": "action-browser",
+        "app/rent-vps-hosting/page": "action-browser",
+        "app/reset-password/page": "action-browser",
+        "app/resource_category/free-robots-indicators-seminars/page": "action-browser",
+        "app/resource_category/indicator/page": "action-browser",
+        "app/resource_category/robot/page": "action-browser",
+        "app/risk-calculator/page": "action-browser",
+        "app/shop/page": "action-browser",
+        "app/sign-up/page": "action-browser",
+        "app/support/page": "action-browser",
+        "app/terms-and-conditions/page": "action-browser",
+        "app/trading-tool/[id]/page": "action-browser",
+        "app/videos/page": "action-browser",
+        "app/vip-signals-group/page": "action-browser",
+        "app/vip-trading-bots/page": "action-browser",
+        "app/vip-trading-indicators/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/promo-banner-settings.ts",
+      "exportedName": "getPromoBannerSettings"
+    },
+    "0092ca78d178c98ce0bf49f60cbe7dd0a703e83de0": {
+      "workers": {
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 96555,
+          "async": false,
+          "exportedName": "getMentorshipSettings",
+          "filename": "mrp_frontend/app/actions/mentorship-settings.ts"
+        },
+        "app/mentorship-course/page": {
+          "moduleId": 23065,
+          "async": false,
+          "exportedName": "getMentorshipSettings",
+          "filename": "mrp_frontend/app/actions/mentorship-settings.ts"
+        },
+        "app/page": {
+          "moduleId": 13047,
+          "async": false,
+          "exportedName": "getMentorshipSettings",
+          "filename": "mrp_frontend/app/actions/mentorship-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/page": "action-browser",
+        "app/mentorship-course/page": "action-browser",
+        "app/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/mentorship-settings.ts",
+      "exportedName": "getMentorshipSettings"
+    },
+    "00280d9ac302bc5ab0486c28954fede661899a6372": {
+      "workers": {
+        "app/account-management/page": {
+          "moduleId": 80120,
+          "async": false,
+          "exportedName": "getAccountManagementSettings",
+          "filename": "mrp_frontend/app/actions/account-management-settings.ts"
+        },
+        "app/admin/(dashboard)/account-management/page": {
+          "moduleId": 87353,
+          "async": false,
+          "exportedName": "getAccountManagementSettings",
+          "filename": "mrp_frontend/app/actions/account-management-settings.ts"
+        },
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 96555,
+          "async": false,
+          "exportedName": "getAccountManagementSettings",
+          "filename": "mrp_frontend/app/actions/account-management-settings.ts"
+        }
+      },
+      "layer": {
+        "app/account-management/page": "action-browser",
+        "app/admin/(dashboard)/account-management/page": "action-browser",
+        "app/admin/(dashboard)/settings/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/account-management-settings.ts",
+      "exportedName": "getAccountManagementSettings"
+    },
+    "40a71d819d6dcea6b594ab36af06b029ddb2e263d0": {
+      "workers": {
+        "app/admin/(dashboard)/account-management/page": {
+          "moduleId": 87353,
+          "async": false,
+          "exportedName": "updateAccountManagementSettings",
+          "filename": "mrp_frontend/app/actions/account-management-settings.ts"
+        },
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 96555,
+          "async": false,
+          "exportedName": "updateAccountManagementSettings",
+          "filename": "mrp_frontend/app/actions/account-management-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/account-management/page": "action-browser",
+        "app/admin/(dashboard)/settings/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/account-management-settings.ts",
+      "exportedName": "updateAccountManagementSettings"
+    },
+    "00ed0e3055d11d5bcd535808d58145b0a33e32ab4f": {
+      "workers": {
+        "app/admin/(dashboard)/copy-trading/page": {
+          "moduleId": 11785,
+          "async": false,
+          "exportedName": "getCopyTradingSettings",
+          "filename": "mrp_frontend/app/actions/copy-trading-settings.ts"
+        },
+        "app/copy-trading/page": {
+          "moduleId": 16532,
+          "async": false,
+          "exportedName": "getCopyTradingSettings",
+          "filename": "mrp_frontend/app/actions/copy-trading-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/copy-trading/page": "action-browser",
+        "app/copy-trading/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/copy-trading-settings.ts",
+      "exportedName": "getCopyTradingSettings"
+    },
+    "40cc37184531d5e6024bf71f25534ec22bfa57c53c": {
+      "workers": {
+        "app/admin/(dashboard)/copy-trading/page": {
+          "moduleId": 11785,
+          "async": false,
+          "exportedName": "updateCopyTradingSettings",
+          "filename": "mrp_frontend/app/actions/copy-trading-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/copy-trading/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/copy-trading-settings.ts",
+      "exportedName": "updateCopyTradingSettings"
+    },
+    "001ae79117c5582ace499dddb2720610d4afe540a7": {
+      "workers": {
+        "app/admin/(dashboard)/prop-firm/page": {
+          "moduleId": 32424,
+          "async": false,
+          "exportedName": "getPropFirmSettings",
+          "filename": "mrp_frontend/app/actions/prop-firm-settings.ts"
+        },
+        "app/pass-funded-accounts/checkout/page": {
+          "moduleId": 48186,
+          "async": false,
+          "exportedName": "getPropFirmSettings",
+          "filename": "mrp_frontend/app/actions/prop-firm-settings.ts"
+        },
+        "app/pass-funded-accounts/page": {
+          "moduleId": 72930,
+          "async": false,
+          "exportedName": "getPropFirmSettings",
+          "filename": "mrp_frontend/app/actions/prop-firm-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/prop-firm/page": "action-browser",
+        "app/pass-funded-accounts/checkout/page": "action-browser",
+        "app/pass-funded-accounts/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/prop-firm-settings.ts",
+      "exportedName": "getPropFirmSettings"
+    },
+    "4095540ff2961355dd11bb1904f7e044caf6fc8f16": {
+      "workers": {
+        "app/admin/(dashboard)/prop-firm/page": {
+          "moduleId": 32424,
+          "async": false,
+          "exportedName": "updatePropFirmSettings",
+          "filename": "mrp_frontend/app/actions/prop-firm-settings.ts"
+        },
+        "app/pass-funded-accounts/checkout/page": {
+          "moduleId": 48186,
+          "async": false,
+          "exportedName": "updatePropFirmSettings",
+          "filename": "mrp_frontend/app/actions/prop-firm-settings.ts"
+        },
+        "app/pass-funded-accounts/page": {
+          "moduleId": 72930,
+          "async": false,
+          "exportedName": "updatePropFirmSettings",
+          "filename": "mrp_frontend/app/actions/prop-firm-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/prop-firm/page": "action-browser",
+        "app/pass-funded-accounts/checkout/page": "action-browser",
+        "app/pass-funded-accounts/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/prop-firm-settings.ts",
+      "exportedName": "updatePropFirmSettings"
+    },
+    "4003d0a4c64603c77be76d1284496f83bf41956f1e": {
+      "workers": {
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 96555,
+          "async": false,
+          "exportedName": "updateMentorshipSettings",
+          "filename": "mrp_frontend/app/actions/mentorship-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/mentorship-settings.ts",
+      "exportedName": "updateMentorshipSettings"
+    },
+    "00065da71ba0b959c2fea2e6a7058f97e6f1c68f70": {
+      "workers": {
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 96555,
+          "async": false,
+          "exportedName": "getMentorship100Settings",
+          "filename": "mrp_frontend/app/actions/mentorship-100-settings.ts"
+        },
+        "app/mentorship-course-100/page": {
+          "moduleId": 73163,
+          "async": false,
+          "exportedName": "getMentorship100Settings",
+          "filename": "mrp_frontend/app/actions/mentorship-100-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/page": "action-browser",
+        "app/mentorship-course-100/page": "rsc"
+      },
+      "filename": "mrp_frontend/app/actions/mentorship-100-settings.ts",
+      "exportedName": "getMentorship100Settings"
+    },
+    "402bba2028c3296e983c57d7f474f5c5c38c443060": {
+      "workers": {
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 96555,
+          "async": false,
+          "exportedName": "updateMentorship100Settings",
+          "filename": "mrp_frontend/app/actions/mentorship-100-settings.ts"
+        },
+        "app/mentorship-course-100/page": {
+          "moduleId": 73163,
+          "async": false,
+          "exportedName": "updateMentorship100Settings",
+          "filename": "mrp_frontend/app/actions/mentorship-100-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/page": "action-browser",
+        "app/mentorship-course-100/page": "rsc"
+      },
+      "filename": "mrp_frontend/app/actions/mentorship-100-settings.ts",
+      "exportedName": "updateMentorship100Settings"
+    },
+    "00bcaadc266e263e52aa687730cae9fca71d9ba6d2": {
+      "workers": {
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 96555,
+          "async": false,
+          "exportedName": "getVIPSettings",
+          "filename": "mrp_frontend/app/actions/vip-settings.ts"
+        },
+        "app/vip-signals-group/page": {
+          "moduleId": 23609,
+          "async": false,
+          "exportedName": "getVIPSettings",
+          "filename": "mrp_frontend/app/actions/vip-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/page": "action-browser",
+        "app/vip-signals-group/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/vip-settings.ts",
+      "exportedName": "getVIPSettings"
+    },
+    "40c3baa70c4b89e32327c1e1fd50c6d07fe5c88911": {
+      "workers": {
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 96555,
+          "async": false,
+          "exportedName": "updateVIPSettings",
+          "filename": "mrp_frontend/app/actions/vip-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/vip-settings.ts",
+      "exportedName": "updateVIPSettings"
+    },
+    "00e5d23d3137348d2ef7dc5fc82bf0f7a28f16d974": {
+      "workers": {
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 96555,
+          "async": false,
+          "exportedName": "getPrivateMentorshipSettings",
+          "filename": "mrp_frontend/app/actions/private-mentorship-settings.ts"
+        },
+        "app/private-mentorship/page": {
+          "moduleId": 76887,
+          "async": false,
+          "exportedName": "getPrivateMentorshipSettings",
+          "filename": "mrp_frontend/app/actions/private-mentorship-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/page": "action-browser",
+        "app/private-mentorship/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/private-mentorship-settings.ts",
+      "exportedName": "getPrivateMentorshipSettings"
+    },
+    "40c33a39641b406f4b71350bee91fa8ebadd07c3c5": {
+      "workers": {
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 96555,
+          "async": false,
+          "exportedName": "updatePrivateMentorshipSettings",
+          "filename": "mrp_frontend/app/actions/private-mentorship-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/private-mentorship-settings.ts",
+      "exportedName": "updatePrivateMentorshipSettings"
+    },
+    "400e55075906b3a5955a42cd57c9977ef008297a5b": {
+      "workers": {
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 96555,
+          "async": false,
+          "exportedName": "updatePromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/promo-banner-settings.ts",
+      "exportedName": "updatePromoBannerSettings"
+    },
+    "00c359d510ed5fa43654195302852e53f2644a65d5": {
+      "workers": {
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 96555,
+          "async": false,
+          "exportedName": "getYoutubeSettings",
+          "filename": "mrp_frontend/app/actions/youtube-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/youtube-settings.ts",
+      "exportedName": "getYoutubeSettings"
+    },
+    "407b1e6566aa7f2a14db00176563b23635c634775a": {
+      "workers": {
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 96555,
+          "async": false,
+          "exportedName": "updateYoutubeSettings",
+          "filename": "mrp_frontend/app/actions/youtube-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/youtube-settings.ts",
+      "exportedName": "updateYoutubeSettings"
+    },
+    "007fe384f1ff8a56148a10627cc1043100097c9a4b": {
+      "workers": {
+        "app/admin/(dashboard)/settings/security/page": {
+          "moduleId": 12027,
+          "async": false,
+          "exportedName": "getSecuritySettings",
+          "filename": "mrp_frontend/app/actions/security-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/security/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/security-settings.ts",
+      "exportedName": "getSecuritySettings"
+    },
+    "40427bcfbd6df6fa3c0b1acf019c633f4823b62e22": {
+      "workers": {
+        "app/admin/(dashboard)/settings/security/page": {
+          "moduleId": 12027,
+          "async": false,
+          "exportedName": "updateSecuritySettings",
+          "filename": "mrp_frontend/app/actions/security-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/security/page": "action-browser"
+      },
+      "filename": "mrp_frontend/app/actions/security-settings.ts",
+      "exportedName": "updateSecuritySettings"
+    }
+  },
+  "edge": {},
+  "encryptionKey": "HKShAR3054txn5j+k5Gp159a90SMT4NVG5JDgLN5oyg="
+}

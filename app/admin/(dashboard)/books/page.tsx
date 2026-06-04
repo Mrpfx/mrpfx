@@ -35,8 +35,8 @@ export default function BooksPage() {
         try {
             const isFree = filter === 'any' ? undefined : filter === 'free';
             const data = await adminDynamicService.getBooks(isFree);
-            if (Array.isArray(data)) {
-                setBooks(data);
+            if (data && data.items) {
+                setBooks(data.items);
             }
         } catch (error) {
             console.error("Failed to fetch books", error);

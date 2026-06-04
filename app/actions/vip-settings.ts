@@ -5,23 +5,23 @@ import path from 'path';
 
 const SETTINGS_FILE = path.join(process.cwd(), 'vip-settings.json');
 
-export interface VIPPlanLinks {
-    oneMonth: { paymentLink: string };
-    twelveMonths: { paymentLink: string };
-    unlimited: { paymentLink: string };
+export interface VIPPlanSlugs {
+    oneMonth: { slug: string };
+    twelveMonths: { slug: string };
+    unlimited: { slug: string };
 }
 
 export interface VIPSettings {
-    plans: VIPPlanLinks;
+    plans: VIPPlanSlugs;
     registrationOpenDate: string | null;
     groupPageLink: string;
 }
 
 const DEFAULT_SETTINGS: VIPSettings = {
     plans: {
-        oneMonth: { paymentLink: '' },
-        twelveMonths: { paymentLink: '' },
-        unlimited: { paymentLink: '' },
+        oneMonth: { slug: 'vip-signals-1-month' },
+        twelveMonths: { slug: 'vip-signals-12-months' },
+        unlimited: { slug: 'vip-signals-unlimited' },
     },
     registrationOpenDate: null,
     groupPageLink: '',

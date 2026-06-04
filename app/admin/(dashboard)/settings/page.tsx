@@ -5,9 +5,11 @@ import { getMentorshipSettings, updateMentorshipSettings } from '@/app/actions/m
 import { getMentorship100Settings, updateMentorship100Settings } from '@/app/actions/mentorship-100-settings';
 import { getVIPSettings, updateVIPSettings, VIPSettings } from '@/app/actions/vip-settings';
 import { getPrivateMentorshipSettings, updatePrivateMentorshipSettings } from '@/app/actions/private-mentorship-settings';
-import { getPropFirmSettings, updatePropFirmSettings } from '@/app/actions/prop-firm-settings';
 import { getPromoBannerSettings, updatePromoBannerSettings } from '@/app/actions/promo-banner-settings';
-import { Save } from 'lucide-react';
+import { getAccountManagementSettings, updateAccountManagementSettings, AccountManagementSettings } from '@/app/actions/account-management-settings';
+import { getYoutubeSettings, updateYoutubeSettings } from '@/app/actions/youtube-settings';
+import { getPhysicalClassesSettings, updatePhysicalClassesSettings } from '@/app/actions/physical-classes-settings';
+import { Save, Youtube, MapPin } from 'lucide-react';
 
 export default function SettingsPage() {
     const [date, setDate] = useState('');
@@ -21,20 +23,23 @@ export default function SettingsPage() {
     const [saving100, setSaving100] = useState(false);
     const [message100, setMessage100] = useState('');
 
-    const [vipLinks, setVipLinks] = useState({ oneMonth: '', twelveMonths: '', unlimited: '' });
+    const [vipSlugs, setVipSlugs] = useState({ oneMonth: '', twelveMonths: '', unlimited: '' });
     const [vipDate, setVipDate] = useState('');
     const [vipGroupLink, setVipGroupLink] = useState('');
     const [savingVip, setSavingVip] = useState(false);
     const [vipMessage, setVipMessage] = useState('');
 
-    const [privateSlug, setPrivateSlug] = useState('private-mentorship');
+    const [classASlug, setClassASlug] = useState('private-mentorship-class-a');
+    const [classBSlug, setClassBSlug] = useState('private-mentorship-class-b');
     const [savingPrivate, setSavingPrivate] = useState(false);
     const [privateMessage, setPrivateMessage] = useState('');
 
-    const [propFirmDiscountActive, setPropFirmDiscountActive] = useState(false);
-    const [propFirmDiscountPercentage, setPropFirmDiscountPercentage] = useState(0);
-    const [savingPropFirm, setSavingPropFirm] = useState(false);
-    const [propFirmMessage, setPropFirmMessage] = useState('');
+    const [physClassASlug, setPhysClassASlug] = useState('physical-class-a');
+    const [physClassBSlug, setPhysClassBSlug] = useState('physical-class-b');
+    const [savingPhys, setSavingPhys] = useState(false);
+    const [physMessage, setPhysMessage] = useState('');
+
+
 
     const [promoActive, setPromoActive] = useState(false);
     const [promoText, setPromoText] = useState('');
@@ -42,6 +47,16 @@ export default function SettingsPage() {
     const [promoColor, setPromoColor] = useState('bg-[#5B2EFF]');
     const [savingPromo, setSavingPromo] = useState(false);
     const [promoMessage, setPromoMessage] = useState('');
+
+    const [accMgmtMinCapital, setAccMgmtMinCapital] = useState(500);
+    const [accMgmtPlaceholder, setAccMgmtPlaceholder] = useState('');
+    const [savingAccMgmt, setSavingAccMgmt] = useState(false);
+    const [accMgmtMessage, setAccMgmtMessage] = useState('');
+
+    const [youtubeApiKey, setYoutubeApiKey] = useState('');
+    const [youtubeChannelId, setYoutubeChannelId] = useState('');
+    const [savingYoutube, setSavingYoutube] = useState(false);
+    const [youtubeMessage, setYoutubeMessage] = useState('');
 
     useEffect(() => {
         getMentorshipSettings().then(data => {
@@ -68,10 +83,10 @@ export default function SettingsPage() {
             }
         });
         getVIPSettings().then(data => {
-            setVipLinks({
-                oneMonth: data.plans.oneMonth.paymentLink || '',
-                twelveMonths: data.plans.twelveMonths.paymentLink || '',
-                unlimited: data.plans.unlimited.paymentLink || '',
+            setVipSlugs({
+                oneMonth: data.plans.oneMonth.slug || '',
+                twelveMonths: data.plans.twelveMonths.slug || '',
+                unlimited: data.plans.unlimited.slug || '',
             });
             if (data.registrationOpenDate) {
                 const localDate = new Date(data.registrationOpenDate);
@@ -82,19 +97,27 @@ export default function SettingsPage() {
             setVipGroupLink(data.groupPageLink || '');
         });
         getPrivateMentorshipSettings().then(data => {
-            if (data?.productSlug) {
-                setPrivateSlug(data.productSlug);
-            }
+            if (data?.classASlug) setClassASlug(data.classASlug);
+            if (data?.classBSlug) setClassBSlug(data.classBSlug);
         });
-        getPropFirmSettings().then(data => {
-            setPropFirmDiscountActive(data.discountActive || false);
-            setPropFirmDiscountPercentage(data.discountPercentage || 0);
-        });
+
         getPromoBannerSettings().then(data => {
             setPromoActive(data.active || false);
             setPromoText(data.text || '');
             setPromoLink(data.link || '');
             setPromoColor(data.backgroundColor || 'bg-[#5B2EFF]');
+        });
+        getAccountManagementSettings().then(data => {
+            setAccMgmtMinCapital(data.minCapital || 500);
+            setAccMgmtPlaceholder(data.placeholder || '');
+        });
+        getYoutubeSettings().then(data => {
+            setYoutubeApiKey(data.apiKey || '');
+            setYoutubeChannelId(data.channelId || 'UC1m-GvV3P83C66m105c_n6g');
+        });
+        getPhysicalClassesSettings().then(data => {
+            if (data?.classASlug) setPhysClassASlug(data.classASlug);
+            if (data?.classBSlug) setPhysClassBSlug(data.classBSlug);
         });
     }, []);
 
@@ -130,15 +153,15 @@ export default function SettingsPage() {
         try {
             const settings: VIPSettings = {
                 plans: {
-                    oneMonth: { paymentLink: vipLinks.oneMonth },
-                    twelveMonths: { paymentLink: vipLinks.twelveMonths },
-                    unlimited: { paymentLink: vipLinks.unlimited },
+                    oneMonth: { slug: vipSlugs.oneMonth },
+                    twelveMonths: { slug: vipSlugs.twelveMonths },
+                    unlimited: { slug: vipSlugs.unlimited },
                 },
                 registrationOpenDate: vipDate ? new Date(vipDate).toISOString() : null,
                 groupPageLink: vipGroupLink
             };
             await updateVIPSettings(settings);
-            setVipMessage('VIP links saved successfully!');
+            setVipMessage('VIP settings saved successfully!');
         } catch (e) {
             setVipMessage('Failed to save VIP links.');
         }
@@ -149,7 +172,7 @@ export default function SettingsPage() {
         setSavingPrivate(true);
         setPrivateMessage('');
         try {
-            await updatePrivateMentorshipSettings({ productSlug: privateSlug });
+            await updatePrivateMentorshipSettings({ classASlug, classBSlug });
             setPrivateMessage('Private mentorship settings saved successfully!');
         } catch (e) {
             setPrivateMessage('Failed to save private mentorship settings.');
@@ -157,20 +180,19 @@ export default function SettingsPage() {
         setSavingPrivate(false);
     };
 
-    const handleSavePropFirm = async () => {
-        setSavingPropFirm(true);
-        setPropFirmMessage('');
+    const handleSavePhys = async () => {
+        setSavingPhys(true);
+        setPhysMessage('');
         try {
-            await updatePropFirmSettings({
-                discountActive: propFirmDiscountActive,
-                discountPercentage: propFirmDiscountPercentage
-            });
-            setPropFirmMessage('Prop firm settings saved successfully!');
+            await updatePhysicalClassesSettings({ classASlug: physClassASlug, classBSlug: physClassBSlug });
+            setPhysMessage('Physical classes settings saved successfully!');
         } catch (e) {
-            setPropFirmMessage('Failed to save prop firm settings.');
+            setPhysMessage('Failed to save physical classes settings.');
         }
-        setSavingPropFirm(false);
+        setSavingPhys(false);
     };
+
+
 
     const handleSavePromo = async () => {
         setSavingPromo(true);
@@ -189,11 +211,97 @@ export default function SettingsPage() {
         setSavingPromo(false);
     };
 
+    const handleSaveAccMgmt = async () => {
+        setSavingAccMgmt(true);
+        setAccMgmtMessage('');
+        try {
+            await updateAccountManagementSettings({
+                minCapital: accMgmtMinCapital,
+                placeholder: accMgmtPlaceholder
+            });
+            setAccMgmtMessage('Account management settings saved successfully!');
+        } catch (e) {
+            setAccMgmtMessage('Failed to save settings.');
+        }
+        setSavingAccMgmt(false);
+    };
+
+    const handleSaveYoutube = async () => {
+        setSavingYoutube(true);
+        setYoutubeMessage('');
+        try {
+            await updateYoutubeSettings({
+                apiKey: youtubeApiKey,
+                channelId: youtubeChannelId
+            });
+            setYoutubeMessage('YouTube settings saved successfully!');
+        } catch (e) {
+            setYoutubeMessage('Failed to save settings.');
+        }
+        setSavingYoutube(false);
+    };
+
     if (loading) return <div className="p-8 text-gray-400">Loading settings...</div>;
 
     return (
         <div className="p-4 md:p-8 max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold mb-8 text-white">Global Settings</h1>
+
+            {/* YouTube API & Video Feed Settings */}
+            <div className="bg-[#1F2937] rounded-xl shadow-sm border border-gray-800 p-6 mb-6">
+                <h2 className="text-xl font-semibold mb-4 text-white flex items-center gap-2">
+                    <Youtube className="w-6 h-6 text-red-600" />
+                    YouTube API & Video Feed
+                </h2>
+                <p className="text-sm text-gray-500 mb-6 font-medium">
+                    Configure the YouTube Data API to fetch live videos for the homepage.
+                </p>
+
+                <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                        YouTube API Key (v3)
+                    </label>
+                    <p className="text-xs text-gray-500 mb-2">
+                        If left blank, the site will automatically fall back to the three default videos.
+                    </p>
+                    <input
+                        type="password"
+                        value={youtubeApiKey}
+                        onChange={(e) => setYoutubeApiKey(e.target.value)}
+                        placeholder="Paste your Google API Key here..."
+                        className="w-full p-3 bg-[#111827] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-red-500 outline-none placeholder-gray-600 font-mono text-sm"
+                    />
+                </div>
+
+                <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                        YouTube Channel ID
+                    </label>
+                    <input
+                        type="text"
+                        value={youtubeChannelId}
+                        onChange={(e) => setYoutubeChannelId(e.target.value)}
+                        placeholder="UC1m-GvV3P83C66m105c_n6g"
+                        className="w-full md:w-1/2 p-3 bg-[#111827] border border-gray-800 text-white rounded-lg focus:ring-2 focus:ring-red-500 outline-none placeholder-gray-600 font-mono text-sm"
+                    />
+                </div>
+
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={handleSaveYoutube}
+                        disabled={savingYoutube}
+                        className="flex items-center gap-2 px-6 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                    >
+                        <Save className="w-5 h-5" />
+                        {savingYoutube ? 'Saving...' : 'Save YouTube Settings'}
+                    </button>
+                    {youtubeMessage && (
+                        <span className={`text-sm ${youtubeMessage.includes('success') ? 'text-green-400' : 'text-red-400'}`}>
+                            {youtubeMessage}
+                        </span>
+                    )}
+                </div>
+            </div>
 
             {/* Global Promo Banner */}
             <div className="bg-[#1F2937] rounded-xl shadow-sm border border-gray-800 p-6 mb-6">
@@ -398,17 +506,17 @@ export default function SettingsPage() {
 
                 <div className="space-y-4 mb-6">
                     {([
-                        { label: '1 Month – $199 (STARTER)', key: 'oneMonth' },
+                        { label: '1 Month – $39 (STARTER)', key: 'oneMonth' },
                         { label: '12 Months – $299 (BEST VALUE)', key: 'twelveMonths' },
                         { label: 'Unlimited – $499 (BEST DEAL)', key: 'unlimited' },
-                    ] as { label: string; key: keyof typeof vipLinks }[]).map(({ label, key }) => (
+                    ] as { label: string; key: keyof typeof vipSlugs }[]).map(({ label, key }) => (
                         <div key={key}>
                             <label className="block text-sm font-medium text-gray-300 mb-1">{label}</label>
                             <input
-                                type="url"
-                                value={vipLinks[key]}
-                                onChange={(e) => setVipLinks(prev => ({ ...prev, [key]: e.target.value }))}
-                                placeholder="https://payment.link/..."
+                                type="text"
+                                value={vipSlugs[key]}
+                                onChange={(e) => setVipSlugs(prev => ({ ...prev, [key]: e.target.value }))}
+                                placeholder="vip-membership-1-month"
                                 className="w-full p-3 bg-[#111827] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none placeholder-gray-500 font-mono text-sm"
                             />
                         </div>
@@ -436,16 +544,16 @@ export default function SettingsPage() {
 
                 <div className="mb-8">
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Main Checkout Link (Sellar Link)
+                        Main Checkout Slug or URL
                     </label>
                     <p className="text-sm text-gray-500 mb-4">
-                        Primary Sellar link for the VIP Signals Group page CTA button.
+                        Primary product slug (e.g., vip-membership) or external Sellar link for the VIP Signals Group page CTA button.
                     </p>
                     <input
-                        type="url"
+                        type="text"
                         value={vipGroupLink}
                         onChange={(e) => setVipGroupLink(e.target.value)}
-                        placeholder="https://sellar.co/..."
+                        placeholder="vip-membership"
                         className="w-full p-3 bg-[#111827] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none placeholder-gray-500 font-mono text-sm"
                     />
                 </div>
@@ -457,7 +565,7 @@ export default function SettingsPage() {
                         className="flex items-center gap-2 px-6 py-2.5 bg-yellow-600 text-white font-medium rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50"
                     >
                         <Save className="w-5 h-5" />
-                        {savingVip ? 'Saving...' : 'Save VIP Links'}
+                        {savingVip ? 'Saving...' : 'Save VIP Settings'}
                     </button>
                     {vipMessage && (
                         <span className={`text-sm ${vipMessage.includes('success') ? 'text-green-400' : 'text-red-400'}`}>
@@ -471,20 +579,31 @@ export default function SettingsPage() {
             <div className="bg-[#1F2937] rounded-xl shadow-sm border border-gray-800 p-6 mt-6">
                 <h2 className="text-xl font-semibold mb-4 text-white">Private 1-on-1 Mentorship</h2>
 
-                <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Private Mentorship Product Slug
-                    </label>
-                    <p className="text-sm text-gray-500 mb-4">
-                        The WooCommerce product slug for Private Mentorship (e.g., private-mentorship). This should be a variable product with "Class A" and "Class B" variations.
-                    </p>
-                    <input
-                        type="text"
-                        value={privateSlug}
-                        onChange={(e) => setPrivateSlug(e.target.value)}
-                        placeholder="private-mentorship"
-                        className="w-full md:w-1/2 p-3 bg-[#111827] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none placeholder-gray-500 font-mono"
-                    />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Class A Product Slug
+                        </label>
+                        <input
+                            type="text"
+                            value={classASlug}
+                            onChange={(e) => setClassASlug(e.target.value)}
+                            placeholder="private-mentorship-class-a"
+                            className="w-full p-3 bg-[#111827] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none placeholder-gray-600 font-mono"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Class B Product Slug
+                        </label>
+                        <input
+                            type="text"
+                            value={classBSlug}
+                            onChange={(e) => setClassBSlug(e.target.value)}
+                            placeholder="private-mentorship-class-b"
+                            className="w-full p-3 bg-[#111827] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none placeholder-gray-600 font-mono"
+                        />
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -504,56 +623,109 @@ export default function SettingsPage() {
                 </div>
             </div>
 
-            {/* Prop Firm Settings */}
+            {/* Physical Classes Mentorship Settings */}
             <div className="bg-[#1F2937] rounded-xl shadow-sm border border-gray-800 p-6 mt-6">
-                <h2 className="text-xl font-semibold mb-4 text-white">Prop Firm Registration (Pass Funded)</h2>
+                <h2 className="text-xl font-semibold mb-4 text-white flex items-center gap-2">
+                    <MapPin className="w-6 h-6 text-blue-500" />
+                    Physical Classes Mentorship
+                </h2>
 
-                <div className="mb-6 flex items-center gap-3">
-                    <input
-                        type="checkbox"
-                        id="discountActive"
-                        checked={propFirmDiscountActive}
-                        onChange={(e) => setPropFirmDiscountActive(e.target.checked)}
-                        className="w-5 h-5 bg-[#111827] border-gray-700 rounded text-blue-600 focus:ring-blue-500"
-                    />
-                    <label htmlFor="discountActive" className="text-sm font-medium text-gray-300 cursor-pointer">
-                        Activate Global Discount Mode
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Class A Product Slug (Standard)
+                        </label>
+                        <input
+                            type="text"
+                            value={physClassASlug}
+                            onChange={(e) => setPhysClassASlug(e.target.value)}
+                            placeholder="physical-class-a"
+                            className="w-full p-3 bg-[#111827] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none placeholder-gray-600 font-mono"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Class B Product Slug (Private)
+                        </label>
+                        <input
+                            type="text"
+                            value={physClassBSlug}
+                            onChange={(e) => setPhysClassBSlug(e.target.value)}
+                            placeholder="physical-class-b"
+                            className="w-full p-3 bg-[#111827] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none placeholder-gray-600 font-mono"
+                        />
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={handleSavePhys}
+                        disabled={savingPhys}
+                        className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    >
+                        <Save className="w-5 h-5" />
+                        {savingPhys ? 'Saving...' : 'Save Physical Classes Settings'}
+                    </button>
+                    {physMessage && (
+                        <span className={`text-sm ${physMessage.includes('success') ? 'text-green-400' : 'text-red-400'}`}>
+                            {physMessage}
+                        </span>
+                    )}
+                </div>
+            </div>
+
+            {/* Account Management Settings */}
+            <div className="bg-[#1F2937] rounded-xl shadow-sm border border-gray-800 p-6 mb-6">
+                <h2 className="text-xl font-semibold mb-4 text-white">Account Management</h2>
+
+                <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Minimum Capital ($)
                     </label>
+                    <p className="text-sm text-gray-500 mb-4">
+                        The minimum capital amount required for a user to request account management.
+                    </p>
+                    <input
+                        type="number"
+                        value={accMgmtMinCapital}
+                        onChange={(e) => setAccMgmtMinCapital(Number(e.target.value))}
+                        className="w-full md:w-1/2 p-3 bg-[#111827] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none placeholder-gray-500 font-mono"
+                    />
                 </div>
 
                 <div className="mb-6">
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Discount Percentage (%)
+                        Capital Amount Placeholder
                     </label>
                     <p className="text-sm text-gray-500 mb-4">
-                        The percentage discount applied to all pass funded account checkout sizes when discount mode is active.
+                        The placeholder text shown in the capital amount input field.
                     </p>
                     <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={propFirmDiscountPercentage}
-                        onChange={(e) => setPropFirmDiscountPercentage(Number(e.target.value))}
+                        type="text"
+                        value={accMgmtPlaceholder}
+                        onChange={(e) => setAccMgmtPlaceholder(e.target.value)}
+                        placeholder="e.g. Capital Amount (Min $500)"
                         className="w-full md:w-1/2 p-3 bg-[#111827] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none placeholder-gray-500 font-mono"
                     />
                 </div>
 
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={handleSavePropFirm}
-                        disabled={savingPropFirm}
+                        onClick={handleSaveAccMgmt}
+                        disabled={savingAccMgmt}
                         className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                     >
                         <Save className="w-5 h-5" />
-                        {savingPropFirm ? 'Saving...' : 'Save Prop Firm Settings'}
+                        {savingAccMgmt ? 'Saving...' : 'Save Account Management Settings'}
                     </button>
-                    {propFirmMessage && (
-                        <span className={`text-sm ${propFirmMessage.includes('success') ? 'text-green-400' : 'text-red-400'}`}>
-                            {propFirmMessage}
+                    {accMgmtMessage && (
+                        <span className={`text-sm ${accMgmtMessage.includes('success') ? 'text-green-400' : 'text-red-400'}`}>
+                            {accMgmtMessage}
                         </span>
                     )}
                 </div>
             </div>
+
         </div>
     );
 }

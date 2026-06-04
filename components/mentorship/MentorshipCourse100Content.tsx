@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { productsService } from '@/lib/products';
 import { cartService } from '@/lib/cart';
+import { useCartAuth } from '@/hooks/useCartAuth';
 import { WCProductRead } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 
@@ -16,6 +17,7 @@ export default function MentorshipCourse100Content({ productSlug }: MentorshipCo
     const router = useRouter();
     const [product, setProduct] = useState<WCProductRead | null>(null);
     const [loading, setLoading] = useState(true);
+    const { isAuthenticated, savePendingAction, getPendingAction, clearPendingAction, redirectToLogin } = useCartAuth();
     const [addingToCart, setAddingToCart] = useState(false);
 
     useEffect(() => {
@@ -32,15 +34,47 @@ export default function MentorshipCourse100Content({ productSlug }: MentorshipCo
         fetchData();
     }, [productSlug]);
 
+    useEffect(() => {
+        const pendingAction = getPendingAction();
+        if (pendingAction && product && product.id === pendingAction.productId && isAuthenticated()) {
+            (async () => {
+                try {
+                    await cartService.addToCart(
+                        pendingAction.productId,
+                        pendingAction.quantity,
+                        pendingAction.variationId,
+                        pendingAction.customFields
+                    );
+                    window.dispatchEvent(new CustomEvent('open-checkout'));
+                } catch (e) {
+                    console.error('Failed to execute pending action', e);
+                } finally {
+                    clearPendingAction();
+                }
+            })();
+        }
+    }, [product, isAuthenticated]);
+
     const handleAddToCart = async () => {
         if (!product) return;
+
+        if (!isAuthenticated()) {
+            savePendingAction({
+                type: 'ADD_TO_CART',
+                productId: product.id,
+                quantity: 1
+            });
+            redirectToLogin();
+            return;
+        }
+
         setAddingToCart(true);
         try {
             await cartService.addToCart(product.id, 1);
-            router.push('/checkout');
+            window.dispatchEvent(new CustomEvent('open-checkout'));
         } catch (error) {
             console.error('Failed to add to cart:', error);
-            router.push(`/checkout?product=${productSlug}`);
+            window.dispatchEvent(new CustomEvent('open-checkout'));
         } finally {
             setAddingToCart(false);
         }

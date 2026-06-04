@@ -1,0 +1,50 @@
+{
+  "node": {
+    "00913f5982e0644852ab617d1d68b1a085b6a6dc4d": {
+      "workers": {
+        "app/admin/(dashboard)/account-management/page": {
+          "moduleId": 87353,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/account-management/page": "action-browser"
+      },
+      "exportedName": "getPromoBannerSettings",
+      "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+    },
+    "00280d9ac302bc5ab0486c28954fede661899a6372": {
+      "workers": {
+        "app/admin/(dashboard)/account-management/page": {
+          "moduleId": 87353,
+          "async": false,
+          "exportedName": "getAccountManagementSettings",
+          "filename": "mrp_frontend/app/actions/account-management-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/account-management/page": "action-browser"
+      },
+      "exportedName": "getAccountManagementSettings",
+      "filename": "mrp_frontend/app/actions/account-management-settings.ts"
+    },
+    "40a71d819d6dcea6b594ab36af06b029ddb2e263d0": {
+      "workers": {
+        "app/admin/(dashboard)/account-management/page": {
+          "moduleId": 87353,
+          "async": false,
+          "exportedName": "updateAccountManagementSettings",
+          "filename": "mrp_frontend/app/actions/account-management-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/account-management/page": "action-browser"
+      },
+      "exportedName": "updateAccountManagementSettings",
+      "filename": "mrp_frontend/app/actions/account-management-settings.ts"
+    }
+  },
+  "edge": {}
+}

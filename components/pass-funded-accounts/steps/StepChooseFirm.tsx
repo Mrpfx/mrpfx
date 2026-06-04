@@ -19,24 +19,34 @@ export function StepChooseFirm({ data, updateData, onNext }: Props) {
     };
 
     return (
-        <div className="bg-white p-8 rounded-2xl shadow-xl shadow-slate-200/40 border border-gray-100">
-            <h2 className="text-xl font-bold text-slate-900 mb-2">Choose Your Prop Firm</h2>
-            <p className="text-slate-500 mb-6 text-sm">Select the prop firm you purchased your evaluation from</p>
+        <div className="bg-white p-3 sm:p-10 rounded-2xl sm:rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-slate-100 max-w-2xl mx-auto relative overflow-hidden">
+            {/* Background decorative elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-50 to-emerald-50 rounded-full blur-3xl opacity-50 -mr-20 -mt-20 pointer-events-none"></div>
 
-            <div className="space-y-4">
+            <div className="text-center mb-3 sm:mb-10 relative z-10">
+                <div className="w-8 h-8 sm:w-16 sm:h-16 bg-white rounded-lg sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-6 text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+                    <Building2 className="w-4 h-4 sm:w-7 sm:h-7" />
+                </div>
+                <h2 className="text-lg sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-0.5 sm:mb-3 uppercase italic">Select Prop Firm</h2>
+                <p className="text-[10px] sm:text-sm font-semibold text-slate-500 max-w-sm mx-auto">
+                    Firm you purchased from.
+                </p>
+            </div>
+
+            <div className="space-y-2 sm:space-y-4 relative z-10 max-w-md mx-auto">
                 {FIRMS.map((firm) => (
                     <button
                         key={firm.id}
                         onClick={() => handleSelect(firm.id)}
-                        className={`w-full flex items-center p-4 rounded-xl border transition-all ${data.propFirm === firm.id
-                            ? "border-[#2563EB] bg-[#2563EB]/5 shadow-sm text-[#2563EB] font-bold"
-                            : "border-gray-200 hover:border-[#2563EB]/50 bg-gray-50/50 hover:bg-white text-slate-700 font-semibold"
+                        className={`w-full flex items-center p-3 sm:p-4 rounded-xl sm:rounded-2xl border-2 transition-all duration-300 group ${data.propFirm === firm.id
+                            ? "border-slate-900 bg-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.1)]"
+                            : "border-slate-100 bg-white"
                             }`}
                     >
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 transition-colors ${data.propFirm === firm.id ? "bg-[#2563EB] text-white" : "bg-white border border-gray-200 shadow-sm text-slate-400"}`}>
-                            <Building2 className="w-5 h-5" />
+                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center mr-3 sm:mr-4 transition-colors ${data.propFirm === firm.id ? "bg-white/10 text-white" : "bg-slate-50 text-slate-400"}`}>
+                            <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
                         </div>
-                        <span>{firm.name}</span>
+                        <span className={`text-xs sm:text-base font-bold transition-colors ${data.propFirm === firm.id ? "text-white" : "text-slate-700"}`}>{firm.name}</span>
                     </button>
                 ))}
             </div>
@@ -44,9 +54,9 @@ export function StepChooseFirm({ data, updateData, onNext }: Props) {
             <button
                 onClick={onNext}
                 disabled={!data.propFirm}
-                className="w-full mt-8 bg-[#2563EB] hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all shadow-[0_4px_14px_0_rgb(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5"
+                className="w-full mt-4 sm:mt-8 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3.5 sm:py-5 rounded-xl sm:rounded-[1.25rem] transition-all duration-300 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8_30px_rgb(0,0,0,0.2)] flex items-center justify-center gap-2 sm:gap-3 relative z-10 group text-sm sm:text-base max-w-md mx-auto"
             >
-                Continue
+                <span className="tracking-wide">Continue to Account Size</span>
             </button>
         </div>
     );

@@ -22,6 +22,9 @@ import { ConfirmModal } from '@/components/admin/Modals';
 export default function TradingToolsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [tools, setTools] = useState<DynamicTradingTool[]>([]);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
+    const [pageSize] = useState(20);
     const [loading, setLoading] = useState(true);
     const [typeFilter, setTypeFilter] = useState<'any' | 'bot' | 'indicator'>('any');
     const [categoryFilter, setCategoryFilter] = useState<'any' | 'vip' | 'free'>('any');
@@ -31,20 +34,28 @@ export default function TradingToolsPage() {
 
     useEffect(() => {
         fetchTools();
-    }, [typeFilter, categoryFilter]);
+    }, [typeFilter, categoryFilter, page]);
 
     const fetchTools = async () => {
         setLoading(true);
         try {
             const type = typeFilter === 'any' ? undefined : typeFilter;
             const category = categoryFilter === 'any' ? undefined : categoryFilter;
-            const data = await adminDynamicService.getTradingTools(type, category);
-            if (Array.isArray(data)) {
-                setTools(data);
+            const offset = (page - 1) * pageSize;
+            const response = await adminDynamicService.getTradingTools(type, category, pageSize, offset);
+
+            if (response && response.items) {
+                setTools(response.items);
+                setTotal(response.total || response.items.length);
+            } else if (Array.isArray(response)) {
+                // Compatibility for old API if needed
+                setTools(response);
+                setTotal(response.length);
             }
         } catch (error) {
             console.error("Failed to fetch trading tools", error);
             setTools([]);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
@@ -209,9 +220,32 @@ export default function TradingToolsPage() {
                     </table>
                 </div>
 
-                {/* Footer */}
+                {/* Footer and Pagination */}
                 <div className="flex items-center justify-between p-4 border-t border-gray-800 text-sm text-gray-400">
-                    <div>Showing {filteredTools.length} results</div>
+                    <div>
+                        Showing {tools.length} of {total} results
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            disabled={page === 1 || loading}
+                            className="p-1 hover:text-white disabled:opacity-30 disabled:hover:text-gray-400 transition-colors"
+                        >
+                            <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <div className="flex items-center gap-1">
+                            <span className="text-white font-medium">{page}</span>
+                            <span className="text-gray-600">/</span>
+                            <span>{Math.ceil(total / pageSize) || 1}</span>
+                        </div>
+                        <button
+                            onClick={() => setPage(p => p + 1)}
+                            disabled={page >= Math.ceil(total / pageSize) || loading}
+                            className="p-1 hover:text-white disabled:opacity-30 disabled:hover:text-gray-400 transition-colors"
+                        >
+                            <ChevronRight className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
             </div>
 

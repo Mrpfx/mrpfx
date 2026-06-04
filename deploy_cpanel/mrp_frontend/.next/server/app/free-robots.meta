@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/free-robots/layout,_N_T_/free-robots/page,_N_T_/free-robots"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/free-robots/__PAGE__",
+    "/free-robots",
+    "/_index",
+    "/_head"
+  ]
+}

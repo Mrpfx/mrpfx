@@ -70,6 +70,13 @@ export interface MessageResponse {
     success: boolean;
 }
 
+export interface PaginatedResponse<T> {
+    items: T[];
+    total: number;
+    page: number;
+    pageSize: number;
+}
+
 // ============================================================================
 // WORDPRESS USER TYPES
 // ============================================================================
@@ -426,6 +433,32 @@ export interface WCUpdateCartItemRequest {
 export interface WCApplyCouponRequest {
     coupon_code: string;
 }
+
+export interface WCCoupon {
+    id: number;
+    code: string;
+    amount: string;
+    date_created?: string;
+    date_modified?: string;
+    discount_type: 'percent' | 'fixed_cart' | 'fixed_product';
+    description?: string;
+    date_expires?: string | null;
+    usage_count?: number;
+    individual_use?: boolean;
+    product_ids?: number[];
+    excluded_product_ids?: number[];
+    usage_limit?: number | null;
+    usage_limit_per_user?: number | null;
+    free_shipping?: boolean;
+    product_categories?: number[];
+    excluded_product_categories?: number[];
+    exclude_sale_items?: boolean;
+    minimum_amount?: string;
+    maximum_amount?: string;
+    email_restrictions?: string[];
+}
+
+export interface WCCouponUpdate extends Partial<Omit<WCCoupon, 'id' | 'date_created' | 'date_modified' | 'usage_count'>> { }
 
 export interface WCCartItem {
     product_id: number;
@@ -1327,6 +1360,8 @@ export interface DynamicSignal {
     type?: string;
 }
 
+export type SignalPagination = PaginatedResponse<DynamicSignal>;
+
 export interface DynamicSignalCreate {
     title: string;
     instrument: string;
@@ -1352,7 +1387,11 @@ export interface DynamicTradingTool {
     purchase_url?: string;
     price?: string;
     image_url?: string;
+    seller_payment_link?: string;
+    whop_payment_link?: string;
 }
+
+export type TradingToolPagination = PaginatedResponse<DynamicTradingTool>;
 
 export interface DynamicTradingToolCreate {
     title: string;
@@ -1364,6 +1403,8 @@ export interface DynamicTradingToolCreate {
     price?: string;
     status?: string;
     image_url?: string;
+    seller_payment_link?: string;
+    whop_payment_link?: string;
 }
 
 export interface DynamicBook {
@@ -1376,7 +1417,11 @@ export interface DynamicBook {
     purchase_url?: string;
     image_url?: string;
     price?: string;
+    seller_payment_link?: string;
+    whop_payment_link?: string;
 }
+
+export type BookPagination = PaginatedResponse<DynamicBook>;
 
 export interface DynamicBookCreate {
     title: string;
@@ -1387,6 +1432,8 @@ export interface DynamicBookCreate {
     status?: string;
     image_url?: string;
     price?: string;
+    seller_payment_link?: string;
+    whop_payment_link?: string;
 }
 
 export interface DynamicVideo {

@@ -17,10 +17,11 @@ import {
 } from 'lucide-react';
 import { cartService } from '@/lib/cart';
 import { checkoutService } from '@/lib/checkout';
-import { cryptoPaymentsService } from '@/lib/crypto-payments';
 import { productsService } from '@/lib/products';
+import { authService } from '@/lib/auth';
+import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
 import CryptoPaymentModal from '@/components/checkout/CryptoPaymentModal';
-import type { WCCart, WCAddress, CryptoPaymentRead } from '@/lib/types';
+import type { WCCart, WCAddress, WCProductRead } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,25 +34,13 @@ function CheckoutPageContent() {
     const [error, setError] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('crypto');
 
-    const [billing, setBilling] = useState<WCAddress>({
-        first_name: '',
-        last_name: '',
-        address_1: '',
-        address_2: '',
-        city: '',
-        state: '',
-        postcode: '',
-        country: 'NG',
-        email: '',
-        phone: '',
-    });
-
-    const [customerNote, setCustomerNote] = useState('');
+    const { withAuth } = useRequireAuth();
 
     const [showCryptoModal, setShowCryptoModal] = useState(false);
     const [pendingOrderId, setPendingOrderId] = useState<string>('');
     const [showExternalModal, setShowExternalModal] = useState(false);
     const [externalRedirectUrl, setExternalRedirectUrl] = useState<string | null>(null);
+    const [productDetails, setProductDetails] = useState<WCProductRead | null>(null);
 
     useEffect(() => {
         (async () => {
@@ -61,150 +50,151 @@ function CheckoutPageContent() {
 
                 // Auto-select method from URL if present
                 const method = searchParams.get('method');
-                if (method && ['whop', 'seller', 'crypto', 'bank'].includes(method)) {
-                    setPaymentMethod(method);
+                let initialMethod = method && ['whop', 'seller', 'crypto', 'bank'].includes(method) ? method : 'crypto';
+
+                // Fetch full info for the item to check payment links
+                if (data && data.items && data.items.length > 0) {
+                    try {
+                        const firstItem = data.items[0];
+                        const details = await productsService.getProductFull(firstItem.product_id);
+                        setProductDetails(details);
+
+                        // Force crypto if Selar link is absent but seller was requested
+                        if (initialMethod === 'seller' && !details.seller_payment_link) {
+                            initialMethod = 'crypto';
+                        }
+                    } catch (e) {
+                        console.error('Failed fetching product details', e);
+                    }
                 }
+
+                setPaymentMethod(initialMethod);
+                setSubmitting(false);
             } catch (err) {
                 console.error('Failed to load cart', err);
             } finally {
                 setLoading(false);
             }
         })();
+        const handleRefresh = async () => {
+            try {
+                const refreshedData = await cartService.getCart();
+                setCart(refreshedData);
+            } catch (err) {
+                console.error('Cart refresh error', err);
+            }
+        };
+
+        window.addEventListener('cart-updated', handleRefresh);
+        return () => window.removeEventListener('cart-updated', handleRefresh);
     }, [searchParams]);
 
-    const handleBillingChange = (field: keyof WCAddress, value: string) => {
-        setBilling(prev => ({ ...prev, [field]: value }));
-    };
-
     const handlePlaceOrder = async () => {
-        if (!billing.first_name || !billing.last_name || !billing.email) {
-            setError('Please fill in all required fields.');
-            return;
-        }
-        setSubmitting(true);
-        setError('');
-        try {
-            // Aggregate all custom fields from cart items
-            const aggregatedCustomFields: Record<string, string> = {};
-            if (cart && cart.items) {
-                cart.items.forEach(item => {
-                    if (item.custom_fields) {
-                        Object.assign(aggregatedCustomFields, item.custom_fields);
-                    }
-                });
-            }
-
-            const finalPaymentMethod = cart?.total === 0 ? 'free' : paymentMethod;
-            const finalPaymentMethodTitle = cart?.total === 0 ? 'Free Checkout' : (
-                paymentMethod === 'whop' ? 'Whop Checkout' :
-                    paymentMethod === 'seller' ? 'Seller Payment' :
-                        paymentMethod === 'crypto' ? 'Pay with Crypto' : 'Bank Transfer'
-            );
-
-            const request = checkoutService.buildCheckoutRequest(
-                billing,
-                finalPaymentMethod,
-                {
-                    customerNote: customerNote || undefined,
-                    paymentMethodTitle: finalPaymentMethodTitle,
-                    customFields: Object.keys(aggregatedCustomFields).length > 0 ? aggregatedCustomFields : undefined
+        withAuth(async () => {
+            setSubmitting(true);
+            setError('');
+            try {
+                // Aggregate all custom fields from cart items
+                const aggregatedCustomFields: Record<string, string> = {};
+                if (cart && cart.items) {
+                    cart.items.forEach(item => {
+                        if (item.custom_fields) {
+                            Object.assign(aggregatedCustomFields, item.custom_fields);
+                        }
+                    });
                 }
-            );
-            const response = await checkoutService.checkout(request);
 
-            console.log('Checkout response:', response);
-            console.log('Payment method:', paymentMethod);
+                const finalPaymentMethod = cart?.total === 0 ? 'free' : paymentMethod;
+                const finalPaymentMethodTitle = cart?.total === 0 ? 'Free Checkout' : (
+                    paymentMethod === 'whop' ? 'Whop Checkout' :
+                        paymentMethod === 'seller' ? 'Seller Payment' :
+                            paymentMethod === 'crypto' ? 'Pay with Crypto' : 'Bank Transfer'
+                );
 
-            // Handle free orders (total 0)
-            if (cart?.total === 0) {
-                console.log('Free order detected, completing checkout');
-                router.push(`/my-orders/${response.order_id}`);
-                return;
-            }
+                const user = authService.getUserFromToken();
+                const userNameStr = user?.display_name || user?.user_login || 'Member User';
+                const userName = userNameStr.split(' ');
+                const billing: WCAddress = {
+                    first_name: userName[0] || 'Member',
+                    last_name: userName.slice(1).join(' ') || 'User',
+                    email: user?.user_email || 'user@example.com',
+                    address_1: 'N/A',
+                    city: 'N/A',
+                    state: 'N/A',
+                    postcode: '00000',
+                    country: 'NG',
+                    phone: '0000000000'
+                };
 
-            // Handle crypto payment method - show modal for user to select currency
-            if (paymentMethod === 'crypto') {
-                setPendingOrderId(response.order_id.toString());
-                setShowCryptoModal(true);
-                setSubmitting(false); // keep on page to show modal
-                return;
-            }
+                const request = checkoutService.buildCheckoutRequest(
+                    billing,
+                    finalPaymentMethod,
+                    {
+                        customerNote: '',
+                        paymentMethodTitle: finalPaymentMethodTitle,
+                        customFields: Object.keys(aggregatedCustomFields).length > 0 ? aggregatedCustomFields : undefined
+                    }
+                );
+                const response = await checkoutService.checkout(request);
 
-            // Determine external redirect URL for non-crypto methods. Instead of
-            // redirecting immediately, show a confirmation modal so user can opt-in
-            // to be redirected (useful for Whop / Seller / Bank external flows).
-            let chosenExternalUrl: string | null = null;
-            if (paymentMethod === 'whop') {
-                chosenExternalUrl = response.payment_url || response.redirect_url || null;
-                if (!chosenExternalUrl && cart) {
+                // Handle free orders (total 0)
+                if (cart?.total === 0) {
+                    router.push(`/my-orders/${response.order_id}`);
+                    return;
+                }
+
+                // Handle crypto payment method
+                if (paymentMethod === 'crypto') {
+                    setPendingOrderId(response.order_id.toString());
+                    setShowCryptoModal(true);
+                    setSubmitting(false);
+                    return;
+                }
+
+                let chosenExternalUrl = response.payment_url || response.redirect_url || null;
+
+                if (paymentMethod === 'whop' && !chosenExternalUrl && cart) {
                     try {
                         const firstProduct = cart.items[0];
                         if (firstProduct) {
                             const fullProduct = await productsService.getProductFull(firstProduct.product_id);
-                            if (fullProduct.whop_payment_link) {
-                                chosenExternalUrl = fullProduct.whop_payment_link;
-                                console.log('Using whop_payment_link from product:', chosenExternalUrl);
-                            }
+                            if (fullProduct.whop_payment_link) chosenExternalUrl = fullProduct.whop_payment_link;
                         }
                     } catch (err) {
-                        console.error('Failed to fetch whop payment link:', err);
+                        console.error('Failed to get whop link:', err);
                     }
                 }
-            }
 
-            if (paymentMethod === 'seller') {
-                chosenExternalUrl = response.redirect_url || response.payment_url || null;
-                if (!chosenExternalUrl && cart) {
+                if (paymentMethod === 'seller' && !chosenExternalUrl && cart) {
                     try {
                         const firstProduct = cart.items[0];
                         if (firstProduct) {
                             const fullProduct = await productsService.getProductFull(firstProduct.product_id);
-                            if (fullProduct.seller_payment_link) {
-                                chosenExternalUrl = fullProduct.seller_payment_link;
-                                console.log('Using seller_payment_link from product:', chosenExternalUrl);
-                            }
+                            if (fullProduct.seller_payment_link) chosenExternalUrl = fullProduct.seller_payment_link;
                         }
                     } catch (err) {
-                        console.error('Failed to fetch seller payment link:', err);
+                        console.error('Failed to get seller link:', err);
                     }
                 }
-            }
 
-            if (paymentMethod === 'bank') {
-                chosenExternalUrl = response.redirect_url || response.payment_url || null;
-            }
+                if (chosenExternalUrl) {
+                    setPendingOrderId(response.order_id?.toString() || '');
+                    setSubmitting(false);
+                    window.location.href = chosenExternalUrl;
+                    return;
+                }
 
-            // Generic fallback: if backend returned a redirect/payment url and
-            // we haven't yet handled it, use it as an external URL to prompt the user.
-            if (!chosenExternalUrl) {
-                chosenExternalUrl = response.redirect_url || response.payment_url || null;
-            }
-
-            if (chosenExternalUrl) {
-                // Show the external confirmation modal. User will click to proceed
-                // which will perform the redirect. Keep order id so Cancel can go
-                // to the order details page.
-                setPendingOrderId(response.order_id?.toString() || '');
-                setExternalRedirectUrl(chosenExternalUrl);
-                setShowExternalModal(true);
                 setSubmitting(false);
-                return;
+                router.push(`/my-orders/${response.order_id}`);
+            } catch (err: unknown) {
+                const axiosError = err as any;
+                const detail = axiosError?.response?.data?.detail;
+                let errorMsg = 'An error occurred during checkout. Please try again.';
+                if (typeof detail === 'string') errorMsg = detail;
+                setError(errorMsg);
+                setSubmitting(false);
             }
-
-            // If no redirect available, go to order details page
-            console.log('No redirect URLs found, going to orders page');
-            router.push(`/my-orders/${response.order_id}`);
-        } catch (err: any) {
-            const detail = err?.response?.data?.detail;
-            let errorMsg = 'An error occurred during checkout. Please try again.';
-            if (typeof detail === 'string') {
-                errorMsg = detail;
-            } else if (Array.isArray(detail)) {
-                errorMsg = detail.map((e: any) => e.msg || String(e)).join(', ');
-            }
-            setError(errorMsg);
-            setSubmitting(false);
-        }
+        }, { key: 'place-order' });
     };
 
     const formatPrice = (amount: number) =>
@@ -235,41 +225,6 @@ function CheckoutPageContent() {
         );
     }
 
-    const billingFields: { key: keyof WCAddress; label: string; type?: string; required?: boolean; half?: boolean }[] = [
-        { key: 'first_name', label: 'First Name', required: true, half: true },
-        { key: 'last_name', label: 'Last Name', required: true, half: true },
-        { key: 'email', label: 'Email', type: 'email', required: true },
-        { key: 'phone', label: 'Phone', type: 'tel' },
-        { key: 'address_1', label: 'Street Address', required: true },
-        { key: 'address_2', label: 'Apartment, suite, etc.' },
-        { key: 'city', label: 'City', required: true, half: true },
-        { key: 'state', label: 'State', required: true, half: true },
-        { key: 'postcode', label: 'Postal Code', half: true },
-    ];
-
-    const countries = [
-        { code: 'NG', name: 'Nigeria' },
-        { code: 'US', name: 'United States' },
-        { code: 'GB', name: 'United Kingdom' },
-        { code: 'CA', name: 'Canada' },
-        { code: 'GH', name: 'Ghana' },
-        { code: 'KE', name: 'Kenya' },
-        { code: 'ZA', name: 'South Africa' },
-        { code: 'DE', name: 'Germany' },
-        { code: 'FR', name: 'France' },
-        { code: 'AU', name: 'Australia' },
-        { code: 'IN', name: 'India' },
-        { code: 'AE', name: 'United Arab Emirates' },
-        { code: 'SG', name: 'Singapore' },
-        { code: 'BR', name: 'Brazil' },
-        { code: 'JP', name: 'Japan' },
-        { code: 'CN', name: 'China' },
-        { code: 'EG', name: 'Egypt' },
-        { code: 'TZ', name: 'Tanzania' },
-        { code: 'UG', name: 'Uganda' },
-        { code: 'CM', name: 'Cameroon' },
-    ];
-
     return (
         <div className="min-h-screen bg-[#0a0e17]">
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -294,59 +249,6 @@ function CheckoutPageContent() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left: Billing & Payment */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Billing Details */}
-                        <div className="bg-[#111827]/80 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
-                            <h3 className="text-white font-semibold text-sm flex items-center gap-2 mb-5">
-                                <MapPin className="w-4 h-4 text-purple-400" /> Billing Details
-                            </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {billingFields.map(field => (
-                                    <div key={field.key} className={field.half ? '' : 'sm:col-span-2'}>
-                                        <label className="block text-xs text-gray-500 mb-1.5 font-medium">
-                                            {field.label} {field.required && <span className="text-red-400">*</span>}
-                                        </label>
-                                        <input
-                                            type={field.type || 'text'}
-                                            value={(billing[field.key] as string) || ''}
-                                            onChange={e => handleBillingChange(field.key, e.target.value)}
-                                            className="w-full px-3.5 py-2.5 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/30 transition-colors"
-                                        />
-                                    </div>
-                                ))}
-
-                                {/* Country Dropdown */}
-                                <div>
-                                    <label className="block text-xs text-gray-500 mb-1.5 font-medium">
-                                        Country <span className="text-red-400">*</span>
-                                    </label>
-                                    <select
-                                        value={billing.country || 'NG'}
-                                        onChange={e => handleBillingChange('country', e.target.value)}
-                                        className="w-full px-3.5 py-2.5 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white focus:outline-none focus:border-purple-500/30 transition-colors appearance-none"
-                                        style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%236b7280\' stroke-width=\'2\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
-                                    >
-                                        {countries.map(c => (
-                                            <option key={c.code} value={c.code} className="bg-[#111827] text-white">
-                                                {c.name} ({c.code})
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Customer Note */}
-                            <div className="mt-4">
-                                <label className="block text-xs text-gray-500 mb-1.5 font-medium">Order Notes (optional)</label>
-                                <textarea
-                                    rows={3}
-                                    value={customerNote}
-                                    onChange={e => setCustomerNote(e.target.value)}
-                                    placeholder="Notes about your order..."
-                                    className="w-full px-3.5 py-2.5 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/30 transition-colors resize-none"
-                                />
-                            </div>
-                        </div>
-
                         {/* Payment Method - Only show if total > 0 */}
                         {cart?.total && cart.total > 0 ? (
                             <div className="bg-[#111827]/80 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
@@ -355,13 +257,14 @@ function CheckoutPageContent() {
                                 </h3>
                                 <div className="space-y-3">
                                     {[
-                                        { id: 'whop', label: 'Whop Checkout', icon: ExternalLink, badge: 'Direct', badgeColor: 'bg-orange-500/20 text-orange-400' },
-                                        { id: 'seller', label: 'Seller Payment', icon: ExternalLink, badge: 'External', badgeColor: 'bg-cyan-500/20 text-cyan-400' },
-                                        { id: 'crypto', label: 'Pay with Crypto', icon: CreditCard, badge: 'NOWPayments', badgeColor: 'bg-purple-500/20 text-purple-400' },
+                                        // { id: 'whop', label: 'Whop Checkout', icon: ExternalLink, badge: 'Direct', badgeColor: 'bg-orange-500/20 text-orange-400' },
+                                        { id: 'seller', label: 'Seller Payment', icon: ExternalLink, badge: 'External', badgeColor: 'bg-cyan-500/20 text-cyan-400', show: !!productDetails?.seller_payment_link },
+                                        { id: 'crypto', label: 'Pay with Crypto', icon: CreditCard, badge: 'NOWPayments', badgeColor: 'bg-purple-500/20 text-purple-400', show: true },
                                         // { id: 'bank', label: 'Bank Transfer', icon: CreditCard, badge: 'Nigerians Only', badgeColor: 'bg-emerald-500/20 text-emerald-400' },
-                                    ].map(method => (
+                                    ].filter(m => m.show).map(method => (
                                         <button
                                             key={method.id}
+                                            type="button"
                                             onClick={() => setPaymentMethod(method.id)}
                                             className={`w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${paymentMethod === method.id
                                                 ? 'bg-purple-500/10 border-purple-500/30'

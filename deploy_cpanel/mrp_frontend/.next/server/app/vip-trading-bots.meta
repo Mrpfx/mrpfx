@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/vip-trading-bots/layout,_N_T_/vip-trading-bots/page,_N_T_/vip-trading-bots"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/vip-trading-bots/__PAGE__",
+    "/vip-trading-bots",
+    "/_index",
+    "/_head"
+  ]
+}

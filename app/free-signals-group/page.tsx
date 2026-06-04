@@ -4,43 +4,48 @@ import Image from 'next/image';
 import NewsletterSection from '@/components/shared/NewsletterSection';
 import { signalsService } from '@/lib/signals';
 import { useDataWithFallback } from '@/lib/hooks/useDataWithFallback';
-import { Signal } from '@/lib/types';
 import { CheckCircle2, TrendingUp, ArrowRight } from 'lucide-react';
 
-const FALLBACK_FREE_SIGNALS: Signal[] = [
-    {
-        id: 1,
-        title: 'EUR/USD Buy',
-        status: 'active',
-        signal_type: 'free',
-        instrument: 'EUR/USD',
-        type: 'buy',
-        entry: '1.08500',
-        sl: '1.08000',
-        tp1: '1.09200',
-        date: new Date().toISOString(),
-    },
-    {
-        id: 2,
-        title: 'XAU/USD Sell',
-        status: 'active',
-        signal_type: 'free',
-        instrument: 'XAU/USD (GOLD)',
-        type: 'sell',
-        entry: '2350.00',
-        sl: '2365.00',
-        tp1: '2320.00',
-        date: new Date().toISOString(),
-    }
-];
+const FALLBACK_FREE_SIGNALS = {
+    items: [
+        {
+            id: 1,
+            title: 'EUR/USD Buy',
+            status: 'active',
+            signal_type: 'free' as const,
+            instrument: 'EUR/USD',
+            type: 'buy',
+            entry: '1.08500',
+            sl: '1.08000',
+            tp1: '1.09200',
+            date: new Date().toISOString(),
+        },
+        {
+            id: 2,
+            title: 'XAU/USD Sell',
+            status: 'active',
+            signal_type: 'free' as const,
+            instrument: 'XAU/USD (GOLD)',
+            type: 'sell',
+            entry: '2350.00',
+            sl: '2365.00',
+            tp1: '2320.00',
+            date: new Date().toISOString(),
+        }
+    ],
+    total: 2,
+    page: 1,
+    pageSize: 5
+};
 
 const FreeSignalsGroupPage = () => {
-    const { data: signals } = useDataWithFallback(
+    const { data } = useDataWithFallback(
         signalsService.getSignals,
         FALLBACK_FREE_SIGNALS,
         'free',
         5
     );
+    const signals = data?.items || [];
     return (
         <div className="min-h-screen bg-white">
             {/* Hero Section */}

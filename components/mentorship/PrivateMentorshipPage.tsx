@@ -6,35 +6,36 @@ import { useRouter } from 'next/navigation';
 import { getPrivateMentorshipSettings } from '@/app/actions/private-mentorship-settings';
 import { productsService } from '@/lib/products';
 import { cartService } from '@/lib/cart';
-import { WCProductFullRead, WCProductVariationRead } from '@/lib/types';
+import { WCProductRead } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
+import { useCartAuth } from '@/hooks/useCartAuth';
 
 const PrivateMentorshipPage = () => {
     const router = useRouter();
     const [selectedClassName, setSelectedClassName] = useState('Class A (10 Days)');
     const [telegramUsername, setTelegramUsername] = useState('');
-    const [product, setProduct] = useState<WCProductFullRead | null>(null);
-    const [selectedVariation, setSelectedVariation] = useState<WCProductVariationRead | null>(null);
+    const [productA, setProductA] = useState<WCProductRead | null>(null);
+    const [productB, setProductB] = useState<WCProductRead | null>(null);
     const [loading, setLoading] = useState(true);
     const [addingToCart, setAddingToCart] = useState(false);
+    const { isAuthenticated, savePendingAction, getPendingAction, clearPendingAction, redirectToLogin } = useCartAuth();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const settings = await getPrivateMentorshipSettings();
-                const slug = settings?.productSlug || 'private-mentorship';
-                const productData = await productsService.getProductBySlug(slug);
-                if (productData) {
-                    const fullProduct = await productsService.getProductFull(productData.id);
-                    setProduct(fullProduct);
+                const slugA = settings?.classASlug || 'private-mentorship-class-a';
+                const slugB = settings?.classBSlug || 'private-mentorship-class-b';
 
-                    // User said: Class A is the normal product (parent), Class B is the first variation
-                    const classB = fullProduct.variations[0];
+                const [dataA, dataB] = await Promise.all([
+                    productsService.getProductBySlug(slugA),
+                    productsService.getProductBySlug(slugB)
+                ]);
 
-                    // Default to Class A (Parent Product)
-                    setSelectedVariation(null);
-                    setSelectedClassName('Class A (10 Days)');
-                }
+                setProductA(dataA);
+                setProductB(dataB);
+
+                setSelectedClassName('Class A (10 Days)');
             } catch (error) {
                 console.error('Failed to fetch private mentorship data:', error);
             } finally {
@@ -44,41 +45,72 @@ const PrivateMentorshipPage = () => {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        // Execute Pending Cart Action if exists
+        const pendingAction = getPendingAction();
+        // For Private Mentorship, we need to match either class A or class B
+        const relevantProduct = (productA?.id === pendingAction?.productId) ? productA : (productB?.id === pendingAction?.productId) ? productB : null;
+
+        if (pendingAction && relevantProduct && isAuthenticated()) {
+            (async () => {
+                setAddingToCart(true);
+                try {
+                    await cartService.addToCart(
+                        pendingAction.productId,
+                        pendingAction.quantity,
+                        pendingAction.variationId,
+                        pendingAction.customFields
+                    );
+                    window.dispatchEvent(new CustomEvent('open-checkout'));
+                } catch (e) {
+                    console.error('Failed to execute pending cart action', e);
+                } finally {
+                    setAddingToCart(false);
+                    clearPendingAction();
+                }
+            })();
+        }
+    }, [productA, productB, isAuthenticated]);
+
     const handleClassChange = (className: string) => {
         setSelectedClassName(className);
-        if (product) {
-            // Class A -> Parent Product (null variation)
-            // Class B -> First Variation
-            if (className.includes('Class B') && product.variations?.[0]) {
-                setSelectedVariation(product.variations[0]);
-            } else {
-                setSelectedVariation(null);
-            }
-        }
     };
 
     const handleAddToCart = async () => {
-        if (!product) return;
+        const activeProduct = selectedClassName.includes('Class A') ? productA : productB;
+        if (!activeProduct) return;
+
+        if (!isAuthenticated()) {
+            savePendingAction({
+                type: 'ADD_TO_CART',
+                productId: activeProduct.id,
+                quantity: 1,
+                customFields: {
+                    'Telegram Username': telegramUsername
+                }
+            });
+            redirectToLogin();
+            return;
+        }
+
         setAddingToCart(true);
         try {
-            // If selectedVariation is null, it's Class A (Parent Product)
-            await cartService.addToCart(product.id, 1, selectedVariation?.id, {
+            await cartService.addToCart(activeProduct.id, 1, undefined, {
                 'Telegram Username': telegramUsername
             });
-            router.push('/checkout');
+            window.dispatchEvent(new CustomEvent('open-checkout'));
         } catch (error) {
             console.error('Failed to add to cart:', error);
-            // Fallback to manual checkout with params if needed
-            const variationId = selectedVariation?.id;
-            router.push(`/checkout?product=${product.slug}${variationId ? `&variation=${variationId}` : ''}&telegram=${telegramUsername}`);
+            window.dispatchEvent(new CustomEvent('open-checkout'));
         } finally {
             setAddingToCart(false);
         }
     };
 
-    const displayPrice = selectedVariation?.price || product?.price || '499.00';
-    const regularPrice = selectedVariation?.regular_price || product?.regular_price || '100.00';
-    const hasSale = selectedVariation?.sale_price || product?.sale_price;
+    const activeProduct = selectedClassName.includes('Class A') ? productA : productB;
+    const displayPrice = activeProduct?.sale_price || activeProduct?.price || '499.00';
+    const regularPrice = activeProduct?.regular_price || '1000.00';
+    const hasSale = activeProduct?.sale_price && activeProduct.sale_price !== activeProduct.regular_price;
 
     if (loading) {
         return (
@@ -274,7 +306,7 @@ const PrivateMentorshipPage = () => {
                     {/* Right: Pricing */}
                     <div className="w-full lg:w-[420px] shrink-0">
                         <div className="bg-white rounded-[32px] p-8 shadow-[0_15px_50px_rgba(0,0,0,0.08)] border border-gray-100 flex flex-col items-center">
-                            <h4 className="text-[17px] font-bold text-[#1a1a1a] mb-2">Investment for 10 Days</h4>
+                            <h4 className="text-[17px] font-bold text-[#1a1a1a] mb-2">Mentorship for 10 Days</h4>
                             <div className="w-12 h-1 bg-[#0052cc] mb-6 rounded-full"></div>
 
                             <div className="text-2xl text-gray-400 line-through font-medium tracking-tight mb-1">${Number(regularPrice).toLocaleString()}</div>
@@ -311,6 +343,56 @@ const PrivateMentorshipPage = () => {
                             <div className="flex items-center gap-2 text-sm text-[#e6a800] font-medium bg-[#fcf8e3] py-2 px-4 rounded-full">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                                 Only Limited Slots Available!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Physical Study Centers Section */}
+            <section className="px-4 md:px-8 max-w-7xl mx-auto pb-12">
+                <div className="bg-white rounded-[32px] p-8 md:p-12 shadow-[0_15px_50px_rgba(0,0,0,0.05)] border border-gray-100">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-10">
+                        <div className="text-center md:text-left">
+                            <h2 className="text-3xl font-bold text-[#1a1a1a] mb-2">Physical Study <span className="text-[#0052cc]">Centers</span></h2>
+                            <p className="text-gray-600 font-medium">Join our intensive physical trading program in person</p>
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
+                                <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                                <span className="text-[#0052cc] font-bold text-sm tracking-wide uppercase">Open for Enrollment</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Abuja Center */}
+                        <div className="bg-[#f8f9fe] rounded-2xl p-6 border border-gray-100 hover:shadow-lg transition-all group">
+                            <div className="flex items-start gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-[#0052cc]/10 flex items-center justify-center text-[#0052cc] shrink-0 group-hover:bg-[#0052cc] group-hover:text-white transition-colors">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                </div>
+                                <div>
+                                    <h4 className="text-xl font-bold text-[#1a1a1a] mb-2">Abuja Center</h4>
+                                    <p className="text-gray-600 font-medium leading-relaxed">
+                                        Suite B5, no. 1 Omotayo Eremiye Crescent, Arab Road, Abuja
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Lagos Center */}
+                        <div className="bg-[#f8f9fe] rounded-2xl p-6 border border-gray-100 hover:shadow-lg transition-all group">
+                            <div className="flex items-start gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-[#0052cc]/10 flex items-center justify-center text-[#0052cc] shrink-0 group-hover:bg-[#0052cc] group-hover:text-white transition-colors">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                </div>
+                                <div>
+                                    <h4 className="text-xl font-bold text-[#1a1a1a] mb-2">Lagos Center</h4>
+                                    <p className="text-gray-600 font-medium leading-relaxed">
+                                        (The Place Restaurant) Ikota KM 14, Lekki-Epe Expressway, Lagos, Eti-Osa, Lekki 105101, Lagos, Nigeria
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>

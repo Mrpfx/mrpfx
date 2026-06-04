@@ -43,7 +43,12 @@ import type {
     DynamicBook,
     DynamicBookCreate,
     DynamicVideo,
-    DynamicVideoCreate
+    DynamicVideoCreate,
+    TradingToolPagination,
+    BookPagination,
+    SignalPagination,
+    WCCoupon,
+    WCCouponUpdate
 } from './types';
 
 export type {
@@ -90,7 +95,11 @@ export type {
     DynamicBook,
     DynamicBookCreate,
     DynamicVideo,
-    DynamicVideoCreate
+    DynamicVideoCreate,
+    BookPagination,
+    SignalPagination,
+    WCCoupon,
+    WCCouponUpdate
 };
 
 // Stats Service
@@ -726,7 +735,7 @@ export const adminPostService = {
 export const adminDynamicService = {
     // Signals
     getSignals: async (type?: 'vip' | 'free', limit = 20, offset = 0) => {
-        const response = await api.get<DynamicSignal[]>('/signals', { params: { type, limit, offset } });
+        const response = await api.get<SignalPagination>('/signals', { params: { type, limit, offset } });
         return response.data;
     },
     createSignal: async (data: DynamicSignalCreate) => {
@@ -742,8 +751,8 @@ export const adminDynamicService = {
     },
 
     // Trading Tools (Bots & Indicators)
-    getTradingTools: async (type?: 'bot' | 'indicator', category?: 'vip' | 'free') => {
-        const response = await api.get<DynamicTradingTool[]>('/trading-tools', { params: { type, category } });
+    getTradingTools: async (type?: 'bot' | 'indicator', category?: 'vip' | 'free', limit: number = 20, offset: number = 0) => {
+        const response = await api.get<TradingToolPagination>('/trading-tools', { params: { type, category, limit, offset } });
         return response.data;
     },
     createTradingTool: async (data: DynamicTradingToolCreate) => {
@@ -759,8 +768,8 @@ export const adminDynamicService = {
     },
 
     // Forex Books
-    getBooks: async (is_free?: boolean) => {
-        const response = await api.get<DynamicBook[]>('/books', { params: { is_free } });
+    getBooks: async (is_free?: boolean, limit = 100, offset = 0) => {
+        const response = await api.get<BookPagination>('/books', { params: { is_free, limit, offset } });
         return response.data;
     },
     createBook: async (data: DynamicBookCreate) => {
@@ -790,5 +799,28 @@ export const adminDynamicService = {
     },
     deleteVideo: async (id: string) => {
         await api.delete(`/admin/videos/${id}`);
+    }
+};
+
+// Coupon Management Service
+export const adminCouponService = {
+    getAll: async (params: { page?: number, per_page?: number, search?: string } = {}) => {
+        const response = await api.get<WCCoupon[]>('/wordpress/wc/coupons', { params });
+        return response.data;
+    },
+    get: async (id: number) => {
+        const response = await api.get<WCCoupon>(`/wordpress/wc/coupons/${id}`);
+        return response.data;
+    },
+    create: async (data: WCCouponUpdate) => {
+        const response = await api.post<WCCoupon>('/wordpress/wc/coupons', data);
+        return response.data;
+    },
+    update: async (id: number, data: WCCouponUpdate) => {
+        const response = await api.put<WCCoupon>(`/wordpress/wc/coupons/${id}`, data);
+        return response.data;
+    },
+    delete: async (id: number, force: boolean = true) => {
+        await api.delete(`/wordpress/wc/coupons/${id}`, { params: { force } });
     }
 };

@@ -44,6 +44,7 @@ export default function AddSignalPage() {
         try {
             const submitData = {
                 ...formData,
+                price: formData.price === '' ? '0' : formData.price,
                 image_url: featuredImage
                     ? relativizeMediaUrl((featuredImage as any).url || featuredImage.source_url)
                     : relativizeMediaUrl(formData.image_url)

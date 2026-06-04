@@ -12,6 +12,7 @@ export default function EditTraderPage() {
     const traderId = params.trader_id as string;
 
     const [trader, setTrader] = useState<Trader | null>(null);
+    const [debugTraders, setDebugTraders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [successModal, setSuccessModal] = useState({ isOpen: false, message: '' });
     const [errorModal, setErrorModal] = useState({ isOpen: false, message: '' });
@@ -29,16 +30,27 @@ export default function EditTraderPage() {
                 } else if (response && response.traders && Array.isArray(response.traders)) {
                     traders = response.traders;
                 }
+                
+                setDebugTraders(traders);
 
-                const found = traders.find(t => t.trader_id === traderId);
+                const safeId = traderId ? traderId.toLowerCase().trim() : '';
+                const decodedId = traderId ? decodeURIComponent(traderId).toLowerCase().trim() : '';
+                
+                const found = traders.find(t => {
+                    if (!t) return false;
+                    const tid = String(t.trader_id || t.id || '').toLowerCase().trim();
+                    const encTid = encodeURIComponent(tid);
+                    return tid === decodedId || tid === safeId || encTid === safeId || tid.replace(/\s+/g, '%20') === safeId;
+                });
+                
                 if (found) {
                     setTrader(found);
                 } else {
                     setErrorModal({ isOpen: true, message: 'Trader not found.' });
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Failed to fetch trader:', error);
-                setErrorModal({ isOpen: true, message: 'Failed to fetch trader details.' });
+                setErrorModal({ isOpen: true, message: `Failed to fetch trader details: ${error?.message || 'Unknown error'}` });
             } finally {
                 setLoading(false);
             }
@@ -85,8 +97,16 @@ export default function EditTraderPage() {
 
     if (!trader && !loading) {
         return (
-            <div className="text-center py-20">
-                <p className="text-gray-400">Trader not found.</p>
+            <div className="text-center py-20 px-4">
+                <p className="text-gray-400 font-bold text-lg">Trader not found.</p>
+                <p className="text-xs text-gray-500 mt-2">Looking for ID: <span className="font-mono bg-gray-800 px-1 rounded">{traderId}</span></p>
+                <p className="text-xs text-red-400 mt-2">Fetched {debugTraders.length} traders.</p>
+                {debugTraders.length > 0 && (
+                    <div className="mt-4 p-4 bg-gray-900 rounded-lg max-w-2xl mx-auto text-left overflow-auto max-h-48 text-xs font-mono text-gray-400">
+                        Available IDs: 
+                        {debugTraders.map(t => `'${t.trader_id || t.id}'`).join(', ')}
+                    </div>
+                )}
                 <button
                     onClick={() => router.push('/admin/traders')}
                     className="mt-4 text-purple-400 hover:underline"

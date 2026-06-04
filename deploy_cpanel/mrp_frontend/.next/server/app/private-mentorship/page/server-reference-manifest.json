@@ -1,0 +1,35 @@
+{
+  "node": {
+    "00913f5982e0644852ab617d1d68b1a085b6a6dc4d": {
+      "workers": {
+        "app/private-mentorship/page": {
+          "moduleId": 76887,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        }
+      },
+      "layer": {
+        "app/private-mentorship/page": "action-browser"
+      },
+      "exportedName": "getPromoBannerSettings",
+      "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+    },
+    "00e5d23d3137348d2ef7dc5fc82bf0f7a28f16d974": {
+      "workers": {
+        "app/private-mentorship/page": {
+          "moduleId": 76887,
+          "async": false,
+          "exportedName": "getPrivateMentorshipSettings",
+          "filename": "mrp_frontend/app/actions/private-mentorship-settings.ts"
+        }
+      },
+      "layer": {
+        "app/private-mentorship/page": "action-browser"
+      },
+      "exportedName": "getPrivateMentorshipSettings",
+      "filename": "mrp_frontend/app/actions/private-mentorship-settings.ts"
+    }
+  },
+  "edge": {}
+}

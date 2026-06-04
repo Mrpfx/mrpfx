@@ -11,12 +11,14 @@ export default function PassFundedAccountsPage() {
 
     const [discountActive, setDiscountActive] = useState(false);
     const [discountPercentage, setDiscountPercentage] = useState(0);
+    const [pricingTiers, setPricingTiers] = useState<any>({});
 
     useEffect(() => {
         import('@/app/actions/prop-firm-settings').then(module => {
             module.getPropFirmSettings().then(data => {
                 setDiscountActive(data.discountActive || false);
                 setDiscountPercentage(data.discountPercentage || 0);
+                setPricingTiers(data.pricingTiers || {});
             });
         });
     }, []);
@@ -25,7 +27,7 @@ export default function PassFundedAccountsPage() {
         setSelections(prev => ({ ...prev, [cardIndex]: itemIndex }));
     };
 
-    const cards = [
+    const initialCards = [
         {
             title: "2-Step Challenge",
             type: "Step 1 Pass Only",
@@ -72,7 +74,8 @@ export default function PassFundedAccountsPage() {
                 { label: '$50k Account', price: '$490', amount: '490', numericSize: '50000' },
                 { label: '$100k Account', price: '$690', amount: '690', numericSize: '100000' },
                 { label: '$200k Account', price: '$990', amount: '990', numericSize: '200000' },
-                { label: '$300k Account', price: '$1390', amount: '1390', numericSize: '300000' }
+                { label: '$300k Account', price: '$1390', amount: '1390', numericSize: '300000' },
+                { label: '$500k Account', price: '$1790', amount: '1790', numericSize: '500000' }
             ]
         },
         {
@@ -102,6 +105,28 @@ export default function PassFundedAccountsPage() {
         }
     ];
 
+    // Merge dynamic prices
+    const cards = initialCards.map(card => ({
+        ...card,
+        items: card.items.map(item => {
+            const planKey = card.plan.toLowerCase().includes('guarantee') ? 'guaranteed' : 'standard';
+            const challengeKey = card.title.toLowerCase().includes('1-step') ? '1step' : '2step';
+            const scopeKey = card.type.toLowerCase().includes('step 1 pass') ? 'step1' : 'full';
+            const tierKey = `${planKey}-${challengeKey}-${scopeKey}-${item.numericSize}`;
+
+            const dynamicPrice = pricingTiers[tierKey]?.price;
+            if (dynamicPrice) {
+                return {
+                    ...item,
+                    price: `$${dynamicPrice}`,
+                    amount: dynamicPrice.toString()
+                };
+            }
+            return item;
+        })
+    }));
+
+
     return (
         <div className="min-h-screen bg-[#e6e9f5] font-sans font-dm-sans relative overflow-hidden flex flex-col items-center pt-[120px] pb-24">
 
@@ -123,14 +148,14 @@ export default function PassFundedAccountsPage() {
                     With a direct partnership with <span className="font-semibold text-[#2563EB]">PROPFIRMSOL.COM</span>, you can now pass your prop firm challenges and get fully funded within a few days. PropSol also grants you full access to their automated system after account is passed.
                 </p>
 
-                {discountActive && discountPercentage > 0 && (
+                {/*{discountActive && discountPercentage > 0 && (
                     <div className="mb-12 inline-flex items-center gap-2 bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20 px-6 py-3 rounded-2xl">
                         <span className="text-xl">🎉</span>
                         <span className="text-red-600 font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-orange-600">
                             SPECIAL OFFER: {discountPercentage}% OFF ALL CHALLENGES!
                         </span>
                     </div>
-                )}
+                )} */}
 
                 <div className="w-full max-w-6xl mx-auto flex flex-col gap-24">
                     {/* Guaranteed Pass Section */}

@@ -11,11 +11,14 @@ export async function getPrivateMentorshipSettings() {
         return JSON.parse(data);
     } catch (e) {
         // Return default if file doesn't exist
-        return { productSlug: 'private-mentorship' };
+        return {
+            classASlug: 'private-mentorship-class-a',
+            classBSlug: 'private-mentorship-class-b'
+        };
     }
 }
 
-export async function updatePrivateMentorshipSettings(data: { productSlug: string }) {
+export async function updatePrivateMentorshipSettings(data: { classASlug: string, classBSlug: string }) {
     await fs.writeFile(SETTINGS_FILE, JSON.stringify(data, null, 2), 'utf-8');
     return { success: true };
 }

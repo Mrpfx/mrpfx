@@ -20,6 +20,7 @@ import {
 import { cartService } from '@/lib/cart';
 import { productsService, type ProductReview } from '@/lib/products';
 import type { WCProductFullRead, WCProductVariationRead, WCProductRead } from '@/lib/types';
+import { useCartAuth } from '@/hooks/useCartAuth';
 
 interface SingleProductPageProps {
     product: WCProductFullRead;
@@ -55,6 +56,8 @@ const SingleProductPage: React.FC<SingleProductPageProps> = ({ product, relatedP
     const [reviewText, setReviewText] = useState('');
     const [submittingReview, setSubmittingReview] = useState(false);
     const [reviewSuccess, setReviewSuccess] = useState(false);
+
+    const { isAuthenticated, savePendingAction, getPendingAction, clearPendingAction, redirectToLogin } = useCartAuth();
 
     const images = product.images && product.images.length > 0
         ? product.images
@@ -92,7 +95,30 @@ const SingleProductPage: React.FC<SingleProductPageProps> = ({ product, relatedP
                 console.error("Failed to load cart count", err);
             }
         })();
-    }, [product.id]);
+        // Execute Pending Cart Action if exists
+        const pendingAction = getPendingAction();
+        if (pendingAction && pendingAction.productId === product.id && isAuthenticated()) {
+            (async () => {
+                setAddingToCart(true);
+                try {
+                    await cartService.addToCart(
+                        pendingAction.productId,
+                        pendingAction.quantity,
+                        pendingAction.variationId,
+                        pendingAction.customFields
+                    );
+                    setCartCount(prev => prev + pendingAction.quantity);
+                    setAddedToCart(true);
+                    setTimeout(() => setAddedToCart(false), 3000);
+                } catch (e) {
+                    console.error('Failed to execute pending cart action', e);
+                } finally {
+                    setAddingToCart(false);
+                    clearPendingAction();
+                }
+            })();
+        }
+    }, [product.id, isAuthenticated]);
 
     // Initialize selected attributes from the first available variation
     useEffect(() => {
@@ -189,6 +215,18 @@ const SingleProductPage: React.FC<SingleProductPageProps> = ({ product, relatedP
             }
         }
 
+        if (!isAuthenticated()) {
+            savePendingAction({
+                type: 'ADD_TO_CART',
+                productId: product.id,
+                quantity,
+                variationId: (product.type === 'variable' || product.type === 'variable-subscription') ? selectedVariation?.id : undefined,
+                customFields
+            });
+            redirectToLogin();
+            return;
+        }
+
         setAddingToCart(true);
         try {
             await cartService.addToCart(
@@ -201,8 +239,21 @@ const SingleProductPage: React.FC<SingleProductPageProps> = ({ product, relatedP
             // 3. Increment Cart Count by the selected Quantity
             setCartCount(prev => prev + quantity);
 
-            setAddedToCart(true);
-            setTimeout(() => setAddedToCart(false), 3000);
+            // If it's a VIP item with a seller/whop link, trigger the checkout modal immediately
+            if (product.seller_payment_link || product.whop_payment_link) {
+                window.dispatchEvent(new CustomEvent('open-checkout', {
+                    detail: {
+                        sellerLink: product.seller_payment_link,
+                        whopLink: product.whop_payment_link,
+                        method: product.seller_payment_link ? 'seller' : 'whop'
+                    }
+                }));
+            } else {
+                setAddedToCart(true);
+                setTimeout(() => setAddedToCart(false), 3000);
+            }
+        } catch (err) {
+            console.error('Failed to add to cart', err);
         } finally {
             setAddingToCart(false);
         }
@@ -219,19 +270,15 @@ const SingleProductPage: React.FC<SingleProductPageProps> = ({ product, relatedP
 
         setAddingToCart(true);
         try {
-            // First clear cart and add this product
-            await cartService.clearCart();
-            await cartService.addToCart(
-                product.id,
-                quantity,
-                (product.type === 'variable' || product.type === 'variable-subscription') ? selectedVariation?.id : undefined,
-                customFields
-            );
-            // Redirect to checkout with the method pre-selected
-            window.location.href = `/checkout?method=${method}`;
+            const url = method === 'whop' ? product.whop_payment_link : product.seller_payment_link;
+            if (url) {
+                window.location.href = url;
+            } else {
+                alert('Payment link not available');
+                setAddingToCart(false);
+            }
         } catch (err) {
             console.error('Failed to initiate direct checkout', err);
-        } finally {
             setAddingToCart(false);
         }
     };
@@ -533,8 +580,8 @@ const SingleProductPage: React.FC<SingleProductPageProps> = ({ product, relatedP
                             </Link>
                         )}
 
-                        {/* Alternative Checkout Methods */}
-                        {(product.whop_payment_link || product.seller_payment_link) && (
+                        {/* Alternative Checkout Methods - Moving to Centralized Checkout Modal */}
+                        {false && (product.whop_payment_link || product.seller_payment_link) && (
                             <div className="space-y-3 mb-6">
                                 <div className="relative">
                                     <div className="absolute inset-0 flex items-center" aria-hidden="true">

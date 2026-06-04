@@ -1,0 +1,21 @@
+{
+  "apiKey": "",
+  "channelId": "",
+  "defaultVideos": [
+    {
+      "id": "8hrXc3vvUYk",
+      "title": "Mr P Fx Official Trading Strategy",
+      "thumbnail": "https://img.youtube.com/vi/8hrXc3vvUYk/hqdefault.jpg"
+    },
+    {
+      "id": "Tl0Xv26Xn5g",
+      "title": "Live Trading Session with Mr P",
+      "thumbnail": "https://img.youtube.com/vi/Tl0Xv26Xn5g/hqdefault.jpg"
+    },
+    {
+      "id": "RTSjkojGsqc",
+      "title": "Forex Market Analysis & Tips",
+      "thumbnail": "https://img.youtube.com/vi/RTSjkojGsqc/hqdefault.jpg"
+    }
+  ]
+}

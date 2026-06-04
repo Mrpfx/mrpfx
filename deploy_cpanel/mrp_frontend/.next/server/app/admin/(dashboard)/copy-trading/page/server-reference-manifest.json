@@ -1,0 +1,50 @@
+{
+  "node": {
+    "00913f5982e0644852ab617d1d68b1a085b6a6dc4d": {
+      "workers": {
+        "app/admin/(dashboard)/copy-trading/page": {
+          "moduleId": 11785,
+          "async": false,
+          "exportedName": "getPromoBannerSettings",
+          "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/copy-trading/page": "action-browser"
+      },
+      "exportedName": "getPromoBannerSettings",
+      "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
+    },
+    "00ed0e3055d11d5bcd535808d58145b0a33e32ab4f": {
+      "workers": {
+        "app/admin/(dashboard)/copy-trading/page": {
+          "moduleId": 11785,
+          "async": false,
+          "exportedName": "getCopyTradingSettings",
+          "filename": "mrp_frontend/app/actions/copy-trading-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/copy-trading/page": "action-browser"
+      },
+      "exportedName": "getCopyTradingSettings",
+      "filename": "mrp_frontend/app/actions/copy-trading-settings.ts"
+    },
+    "40cc37184531d5e6024bf71f25534ec22bfa57c53c": {
+      "workers": {
+        "app/admin/(dashboard)/copy-trading/page": {
+          "moduleId": 11785,
+          "async": false,
+          "exportedName": "updateCopyTradingSettings",
+          "filename": "mrp_frontend/app/actions/copy-trading-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/copy-trading/page": "action-browser"
+      },
+      "exportedName": "updateCopyTradingSettings",
+      "filename": "mrp_frontend/app/actions/copy-trading-settings.ts"
+    }
+  },
+  "edge": {}
+}

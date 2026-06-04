@@ -1,9 +1,14 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import Image from 'next/image';
 import AccountManagementForm from '@/components/account-management/AccountManagementForm';
 import { Database, ShieldCheck, BadgeCheck } from 'lucide-react';
+import TradersSelectionModal from '@/components/checkout/TradersSelectionModal';
 
 export default function AccountManagementPage() {
+    const [showSelectionModal, setShowSelectionModal] = useState(false);
+
     return (
         <div className="bg-[#f0f4ff] min-h-screen pt-[100px] md:pt-[130px] pb-24 font-dm-sans overflow-hidden relative">
 
@@ -35,7 +40,6 @@ export default function AccountManagementPage() {
                     priority
                     className="opacity-90 md:opacity-100"
                 />
-                {/* Additional fade out at bottom for form blending */}
                 <div
                     className="absolute bottom-0 left-0 right-0 h-[300px] z-10"
                     style={{
@@ -44,10 +48,8 @@ export default function AccountManagementPage() {
                 />
             </div>
 
-            {/* Content Container */}
             <div className="max-w-[1200px] mx-auto px-5 sm:px-6 lg:px-8 relative z-20">
 
-                {/* Top Section (Text Only - Image is in Background Container) */}
                 <div className="w-full lg:w-[50%] text-[#1a1a1a] pb-4 md:pb-8 pt-4 md:pt-[60px] lg:pt-[80px] z-20 text-left min-h-0 md:min-h-[400px] lg:min-h-[500px]">
                     <h1 className="text-[36px] md:text-[46px] lg:text-[52px] font-bold leading-[1.1] text-[#1c2331] mb-2 md:mb-1 mt-6 md:mt-0">
                         Account Management
@@ -63,7 +65,6 @@ export default function AccountManagementPage() {
                         Each strategy follows strict risk controls and monitored execution.
                     </p>
 
-                    {/* Features List */}
                     <ul className="space-y-4 md:space-y-5 text-left max-w-sm">
                         {[
                             "Trades executed by vetted professionals",
@@ -81,13 +82,11 @@ export default function AccountManagementPage() {
                     </ul>
                 </div>
 
-                {/* Full Width Form Section Below Hero */}
                 <div className="w-full z-30 relative mt-4 md:mt-8 flex flex-col items-center">
                     <div className="w-full">
                         <AccountManagementForm />
                     </div>
 
-                    {/* Vertically Stacked Features under Form */}
                     <div className="w-full flex flex-col items-start justify-start text-[#1e293b] text-[15px] md:text-[16px] font-medium space-y-3 mt-8 pl-2 sm:pl-4 max-w-2xl mx-auto lg:max-w-none lg:mx-0 lg:ml-0 xl:ml-0 w-full">
                         <div className="flex items-center">
                             <ShieldCheck className="h-[20px] w-[20px] mr-4 text-[#1E3A8A] stroke-[2.5]" />
@@ -103,15 +102,21 @@ export default function AccountManagementPage() {
                         </div>
                     </div>
 
-                    {/* Outlined Pill Button under features */}
                     <div className="w-full flex justify-center mt-10">
-                        <button className="px-10 py-[14px] bg-transparent border-[1.5px] border-[#cbd5e1] text-[#1E3A8A] font-medium rounded-full hover:bg-white hover:shadow-sm transition-all font-dm-sans text-[16px] shadow-sm">
+                        <button
+                            onClick={() => setShowSelectionModal(true)}
+                            className="px-6 md:px-10 py-[14px] bg-transparent border-[1.5px] border-[#cbd5e1] text-[#1E3A8A] font-bold rounded-full hover:bg-white hover:shadow-sm transition-all font-dm-sans text-[14px] md:text-[16px] shadow-sm whitespace-nowrap"
+                        >
                             See How Traders Are Selected
                         </button>
                     </div>
                 </div>
 
-                {/* Bottom Disclaimer */}
+                <TradersSelectionModal
+                    isOpen={showSelectionModal}
+                    onClose={() => setShowSelectionModal(false)}
+                />
+
                 <div className="w-full flex justify-center mt-12 md:mt-16 pt-8 border-t border-gray-200/60 pb-8">
                     <p className="text-[11px] md:text-[12px] text-center text-[#475569] max-w-[900px] leading-[1.6]">
                         Trading involves risk. Account management is provided through partnerships with independent, performance-vetted traders. MR P FX does not manage accounts directly and only takes a commission for participating traders. We strongly advise reviewing each trader's performance history after proceeding.

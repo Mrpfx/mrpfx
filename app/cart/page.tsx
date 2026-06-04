@@ -287,9 +287,17 @@ export default function CartPage() {
                                         <span className="text-white">{formatPrice(cart!.subtotal)}</span>
                                     </div>
                                     {cart!.discount_total > 0 && (
-                                        <div className="flex justify-between text-emerald-400">
-                                            <span>Discount</span>
-                                            <span>-{formatPrice(cart!.discount_total)}</span>
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between text-emerald-400">
+                                                <span>Discount</span>
+                                                <span>-{formatPrice(cart!.discount_total)}</span>
+                                            </div>
+                                            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 flex items-start gap-3 animate-in fade-in slide-in-from-top-1 duration-300">
+                                                <TicketPercent className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                                                <p className="text-[10px] font-bold text-emerald-400 leading-tight uppercase tracking-widest">
+                                                    Discount is active only when crypto payment is selected
+                                                </p>
+                                            </div>
                                         </div>
                                     )}
                                     {cart!.shipping_total > 0 && (
@@ -310,12 +318,12 @@ export default function CartPage() {
                                     </div>
                                 </div>
 
-                                <Link
-                                    href="/checkout"
+                                <button
+                                    onClick={() => window.dispatchEvent(new CustomEvent('open-checkout'))}
                                     className="w-full flex items-center justify-center gap-2 mt-5 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-purple-500/20"
                                 >
                                     Proceed to Checkout <ArrowRight className="w-4 h-4" />
-                                </Link>
+                                </button>
                             </div>
                         </div>
                     </div>

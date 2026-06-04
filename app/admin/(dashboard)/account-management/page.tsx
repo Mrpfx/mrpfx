@@ -16,12 +16,16 @@ import {
     AlertCircle,
     Server,
     DollarSign,
-    Clock
+    Clock,
+    Plus,
+    Save,
+    Settings
 } from 'lucide-react';
 import { tradersService } from '@/lib/traders';
 import { AccountManagementAdminRead } from '@/lib/types';
 import { SuccessModal, ErrorModal } from '@/components/admin/Modals';
 import toast from 'react-hot-toast';
+import { getAccountManagementSettings, updateAccountManagementSettings, AccountManagementSettings, AccountManagementTier } from '@/app/actions/account-management-settings';
 
 const STATUS_TABS = [
     { id: 'all', label: 'All Connections' },
@@ -29,6 +33,7 @@ const STATUS_TABS = [
     { id: 'active', label: 'Active' },
     { id: 'completed', label: 'Completed' },
     { id: 'failed', label: 'Failed' },
+    { id: 'settings', label: 'Tiers & Pricing' },
 ];
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -59,6 +64,9 @@ export default function AccountManagementAdminPage() {
     const [successModal, setSuccessModal] = useState({ isOpen: false, message: '' });
     const [errorModal, setErrorModal] = useState({ isOpen: false, message: '' });
 
+    const [settings, setSettings] = useState<AccountManagementSettings | null>(null);
+    const [savingSettings, setSavingSettings] = useState(false);
+
     const fetchConnections = async () => {
         try {
             setLoading(true);
@@ -73,9 +81,51 @@ export default function AccountManagementAdminPage() {
         }
     };
 
+    const fetchSettings = async () => {
+        const data = await getAccountManagementSettings();
+        setSettings(data);
+    };
+
     useEffect(() => {
         fetchConnections();
+        fetchSettings();
     }, [page]);
+
+    const handleSaveSettings = async () => {
+        if (!settings) return;
+        setSavingSettings(true);
+        try {
+            await updateAccountManagementSettings(settings);
+            toast.success("Account management settings updated successfully!");
+        } catch (error) {
+            toast.error("Failed to update settings.");
+        } finally {
+            setSavingSettings(false);
+        }
+    };
+
+    const addTier = () => {
+        if (!settings) return;
+        const newTier: AccountManagementTier = { min: 0, max: 0, fee: 0, target: 0, slug: '' };
+        setSettings({
+            ...settings,
+            tiers: [...(settings.tiers || []), newTier]
+        });
+    };
+
+    const removeTier = (index: number) => {
+        if (!settings || !settings.tiers) return;
+        const newTiers = [...settings.tiers];
+        newTiers.splice(index, 1);
+        setSettings({ ...settings, tiers: newTiers });
+    };
+
+    const updateTier = (index: number, field: keyof AccountManagementTier, value: any) => {
+        if (!settings || !settings.tiers) return;
+        const newTiers = [...settings.tiers];
+        newTiers[index] = { ...newTiers[index], [field]: value };
+        setSettings({ ...settings, tiers: newTiers });
+    };
 
     const handleStatusUpdate = async (id: string, newStatus: string) => {
         setUpdating(id);
@@ -272,29 +322,165 @@ export default function AccountManagementAdminPage() {
                 </div>
 
                 {/* Pagination */}
-                <div className="flex items-center justify-between p-4 border-t border-gray-800 bg-[#111827]/30">
-                    <p className="text-xs text-gray-600 font-medium italic">
-                        Showing <span className="text-blue-400 font-bold">{filteredConnections.length}</span> managed accounts
-                    </p>
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setPage(p => Math.max(1, p - 1))}
-                            disabled={page === 1}
-                            className="p-1.5 bg-[#1F2937] border border-gray-800 text-gray-500 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent rounded-lg transition-all shadow-sm"
-                        >
-                            <ChevronLeft className="w-5 h-5" />
-                        </button>
-                        <span className="text-xs text-gray-400 font-mono bg-gray-800 px-3 py-1 rounded-md border border-white/5">{page}</span>
-                        <button
-                            onClick={() => setPage(p => p + 1)}
-                            disabled={connections.length < limit}
-                            className="p-1.5 bg-[#1F2937] border border-gray-800 text-gray-500 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent rounded-lg transition-all shadow-sm"
-                        >
-                            <ChevronRight className="w-5 h-5" />
-                        </button>
+                {activeTab !== 'settings' && (
+                    <div className="flex items-center justify-between p-4 border-t border-gray-800 bg-[#111827]/30">
+                        <p className="text-xs text-gray-600 font-medium italic">
+                            Showing <span className="text-blue-400 font-bold">{filteredConnections.length}</span> managed accounts
+                        </p>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setPage(p => Math.max(1, p - 1))}
+                                disabled={page === 1}
+                                className="p-1.5 bg-[#1F2937] border border-gray-800 text-gray-500 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent rounded-lg transition-all shadow-sm"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </button>
+                            <span className="text-xs text-gray-400 font-mono bg-gray-800 px-3 py-1 rounded-md border border-white/5">{page}</span>
+                            <button
+                                onClick={() => setPage(p => p + 1)}
+                                disabled={connections.length < limit}
+                                className="p-1.5 bg-[#1F2937] border border-gray-800 text-gray-500 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent rounded-lg transition-all shadow-sm"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Settings Tab Content */}
+            {activeTab === 'settings' && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="bg-[#111827] border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
+                        <div className="p-6 border-b border-gray-800 flex items-center justify-between bg-white/[0.02]">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center border border-indigo-500/20">
+                                    <Settings className="w-5 h-5 text-indigo-400" />
+                                </div>
+                                <div>
+                                    <h2 className="text-white font-bold text-lg">Tier Configuration</h2>
+                                    <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Pricing & Product Slugs</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={handleSaveSettings}
+                                disabled={savingSettings}
+                                className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold transition-all active:scale-95 shadow-lg shadow-indigo-600/20 disabled:opacity-50"
+                            >
+                                {savingSettings ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                <span>Save Changes</span>
+                            </button>
+                        </div>
+
+                        <div className="p-8 space-y-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-gray-800/50">
+                                <div className="space-y-2">
+                                    <label className="text-[11px] text-gray-400 font-bold uppercase tracking-widest ml-1">Minimum Capital ($)</label>
+                                    <input
+                                        type="number"
+                                        value={settings?.minCapital || ''}
+                                        onChange={(e) => setSettings(s => s ? { ...s, minCapital: parseInt(e.target.value) } : null)}
+                                        className="w-full bg-[#1F2937] border border-gray-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[11px] text-gray-400 font-bold uppercase tracking-widest ml-1">Input Placeholder</label>
+                                    <input
+                                        type="text"
+                                        value={settings?.placeholder || ''}
+                                        onChange={(e) => setSettings(s => s ? { ...s, placeholder: e.target.value } : null)}
+                                        className="w-full bg-[#1F2937] border border-gray-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                                        <DollarSign className="w-4 h-4 text-emerald-400" /> Capital Tiers
+                                    </h3>
+                                    <button
+                                        onClick={addTier}
+                                        className="flex items-center gap-1 text-[11px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest"
+                                    >
+                                        <Plus className="w-3.5 h-3.5" /> Add Tier
+                                    </button>
+                                </div>
+
+                                <div className="overflow-x-auto rounded-xl border border-gray-800">
+                                    <table className="w-full text-left text-sm">
+                                        <thead className="bg-[#1F2937]/50 text-gray-400 text-[10px] uppercase font-bold tracking-widest border-b border-gray-800">
+                                            <tr>
+                                                <th className="p-4">Range (Min-Max)</th>
+                                                <th className="p-4">Fee ($)</th>
+                                                <th className="p-4">Target ($)</th>
+                                                <th className="p-4">WC Product Slug</th>
+                                                <th className="p-4 text-right">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-800">
+                                            {settings?.tiers?.map((tier, idx) => (
+                                                <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
+                                                    <td className="p-4">
+                                                        <div className="flex items-center gap-2">
+                                                            <input
+                                                                type="number"
+                                                                value={tier.min}
+                                                                onChange={(e) => updateTier(idx, 'min', parseInt(e.target.value))}
+                                                                className="w-20 bg-[#1F2937] border border-gray-800 text-white rounded-lg px-2 py-1.5 text-xs outline-none focus:border-indigo-500"
+                                                            />
+                                                            <span className="text-gray-600">-</span>
+                                                            <input
+                                                                type="number"
+                                                                value={tier.max}
+                                                                onChange={(e) => updateTier(idx, 'max', parseInt(e.target.value))}
+                                                                className="w-20 bg-[#1F2937] border border-gray-800 text-white rounded-lg px-2 py-1.5 text-xs outline-none focus:border-indigo-500"
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4">
+                                                        <input
+                                                            type="number"
+                                                            value={tier.fee}
+                                                            onChange={(e) => updateTier(idx, 'fee', parseInt(e.target.value))}
+                                                            className="w-24 bg-[#1F2937] border border-gray-800 text-emerald-400 font-bold rounded-lg px-2 py-1.5 text-xs outline-none focus:border-indigo-500"
+                                                        />
+                                                    </td>
+                                                    <td className="p-4">
+                                                        <input
+                                                            type="number"
+                                                            value={tier.target}
+                                                            onChange={(e) => updateTier(idx, 'target', parseInt(e.target.value))}
+                                                            className="w-24 bg-[#1F2937] border border-gray-800 text-blue-400 font-bold rounded-lg px-2 py-1.5 text-xs outline-none focus:border-indigo-500"
+                                                        />
+                                                    </td>
+                                                    <td className="p-4">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="e.g. mgt-fee-1k"
+                                                            value={tier.slug}
+                                                            onChange={(e) => updateTier(idx, 'slug', e.target.value)}
+                                                            className="w-full bg-[#1F2937] border border-gray-800 text-gray-300 rounded-lg px-3 py-1.5 text-xs outline-none focus:border-indigo-500"
+                                                        />
+                                                    </td>
+                                                    <td className="p-4 text-right">
+                                                        <button
+                                                            onClick={() => removeTier(idx)}
+                                                            className="p-2 text-gray-600 hover:text-red-400 transition-colors"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Status Update Modal */}
             {editingConnection && (

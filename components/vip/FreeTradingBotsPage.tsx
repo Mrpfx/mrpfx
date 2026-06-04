@@ -17,8 +17,8 @@ const FreeTradingBotsPage = () => {
     useEffect(() => {
         const fetchBots = async () => {
             try {
-                const data = await tradingToolsService.getTools('bot', 'free');
-                setBots(data);
+                const response = await tradingToolsService.getTools('bot', 'free', 50);
+                setBots(response.items || []);
             } catch (error) {
                 console.error("Failed to fetch free bots:", error);
             } finally {
@@ -124,7 +124,7 @@ const FreeTradingBotsPage = () => {
                             <p className="text-slate-500 text-lg font-medium">Files will be uploaded soon.</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
+                        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-10">
                             {bots.map((bot) => (
                                 <FreeRobotCard
                                     key={bot.id}

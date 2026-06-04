@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/resource_category/layout,_N_T_/resource_category/robot/layout,_N_T_/resource_category/robot/page,_N_T_/resource_category/robot"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/resource_category/robot/__PAGE__",
+    "/resource_category/robot",
+    "/resource_category",
+    "/_index",
+    "/_head"
+  ]
+}

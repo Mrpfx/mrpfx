@@ -39,8 +39,8 @@ export default function SignalsPage() {
             const offset = (page - 1) * limit;
             const type = typeFilter === 'any' ? undefined : typeFilter;
             const data = await adminDynamicService.getSignals(type, limit, offset);
-            if (Array.isArray(data)) {
-                setSignals(data);
+            if (data && data.items) {
+                setSignals(data.items);
             }
         } catch (error) {
             console.error("Failed to fetch signals", error);
