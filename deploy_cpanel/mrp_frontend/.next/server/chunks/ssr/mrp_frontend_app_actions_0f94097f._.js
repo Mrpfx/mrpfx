@@ -1,3 +1,0 @@
-module.exports=[43436,63664,a=>{"use strict";var b=a.i(86051);let c=(0,b.createServerReference)("001ae79117c5582ace499dddb2720610d4afe540a7",b.callServer,void 0,b.findSourceMapURL,"getPropFirmSettings");a.s(["getPropFirmSettings",()=>c],43436);let d=(0,b.createServerReference)("4095540ff2961355dd11bb1904f7e044caf6fc8f16",b.callServer,void 0,b.findSourceMapURL,"updatePropFirmSettings");a.s(["updatePropFirmSettings",()=>d],63664)},99268,a=>{"use strict";a.s([],16633),a.i(16633);var b=a.i(43436),c=a.i(63664);a.s(["getPropFirmSettings",()=>b.getPropFirmSettings,"updatePropFirmSettings",()=>c.updatePropFirmSettings],99268)}];
-
-//# sourceMappingURL=mrp_frontend_app_actions_0f94097f._.js.map

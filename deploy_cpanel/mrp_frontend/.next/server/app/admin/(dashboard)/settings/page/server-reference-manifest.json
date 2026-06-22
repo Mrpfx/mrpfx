@@ -1,9 +1,9 @@
 {
   "node": {
-    "00913f5982e0644852ab617d1d68b1a085b6a6dc4d": {
+    "00c02af8655a4969fd67c5487d901d2f0583e05d3b": {
       "workers": {
         "app/admin/(dashboard)/settings/page": {
-          "moduleId": 96555,
+          "moduleId": 92188,
           "async": false,
           "exportedName": "getPromoBannerSettings",
           "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
@@ -15,10 +15,10 @@
       "exportedName": "getPromoBannerSettings",
       "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
     },
-    "0092ca78d178c98ce0bf49f60cbe7dd0a703e83de0": {
+    "008f82fcbac012322cf916e3f7913eebe9a7c4cce9": {
       "workers": {
         "app/admin/(dashboard)/settings/page": {
-          "moduleId": 96555,
+          "moduleId": 92188,
           "async": false,
           "exportedName": "getMentorshipSettings",
           "filename": "mrp_frontend/app/actions/mentorship-settings.ts"
@@ -30,10 +30,10 @@
       "exportedName": "getMentorshipSettings",
       "filename": "mrp_frontend/app/actions/mentorship-settings.ts"
     },
-    "4003d0a4c64603c77be76d1284496f83bf41956f1e": {
+    "407982c4399458ee1bc3ec1e229c57469a00945265": {
       "workers": {
         "app/admin/(dashboard)/settings/page": {
-          "moduleId": 96555,
+          "moduleId": 92188,
           "async": false,
           "exportedName": "updateMentorshipSettings",
           "filename": "mrp_frontend/app/actions/mentorship-settings.ts"
@@ -45,10 +45,10 @@
       "exportedName": "updateMentorshipSettings",
       "filename": "mrp_frontend/app/actions/mentorship-settings.ts"
     },
-    "00065da71ba0b959c2fea2e6a7058f97e6f1c68f70": {
+    "00c0ce2a074ad4beda0f1b6b9d84ad2bbf37a88c02": {
       "workers": {
         "app/admin/(dashboard)/settings/page": {
-          "moduleId": 96555,
+          "moduleId": 92188,
           "async": false,
           "exportedName": "getMentorship100Settings",
           "filename": "mrp_frontend/app/actions/mentorship-100-settings.ts"
@@ -60,10 +60,10 @@
       "exportedName": "getMentorship100Settings",
       "filename": "mrp_frontend/app/actions/mentorship-100-settings.ts"
     },
-    "402bba2028c3296e983c57d7f474f5c5c38c443060": {
+    "40b994eb8459717f9f8e0fcea4cf9e96b0d912f959": {
       "workers": {
         "app/admin/(dashboard)/settings/page": {
-          "moduleId": 96555,
+          "moduleId": 92188,
           "async": false,
           "exportedName": "updateMentorship100Settings",
           "filename": "mrp_frontend/app/actions/mentorship-100-settings.ts"
@@ -75,10 +75,10 @@
       "exportedName": "updateMentorship100Settings",
       "filename": "mrp_frontend/app/actions/mentorship-100-settings.ts"
     },
-    "00bcaadc266e263e52aa687730cae9fca71d9ba6d2": {
+    "00444cb689ee8cb3b1873efa6fd8dfc68a79da0c74": {
       "workers": {
         "app/admin/(dashboard)/settings/page": {
-          "moduleId": 96555,
+          "moduleId": 92188,
           "async": false,
           "exportedName": "getVIPSettings",
           "filename": "mrp_frontend/app/actions/vip-settings.ts"
@@ -90,10 +90,10 @@
       "exportedName": "getVIPSettings",
       "filename": "mrp_frontend/app/actions/vip-settings.ts"
     },
-    "40c3baa70c4b89e32327c1e1fd50c6d07fe5c88911": {
+    "401c925d371b2c4322c6dbe317e22c8b740130156a": {
       "workers": {
         "app/admin/(dashboard)/settings/page": {
-          "moduleId": 96555,
+          "moduleId": 92188,
           "async": false,
           "exportedName": "updateVIPSettings",
           "filename": "mrp_frontend/app/actions/vip-settings.ts"
@@ -105,10 +105,10 @@
       "exportedName": "updateVIPSettings",
       "filename": "mrp_frontend/app/actions/vip-settings.ts"
     },
-    "00e5d23d3137348d2ef7dc5fc82bf0f7a28f16d974": {
+    "00a87057ef23e459e7aa1b309979e80e0fa5b00fe4": {
       "workers": {
         "app/admin/(dashboard)/settings/page": {
-          "moduleId": 96555,
+          "moduleId": 92188,
           "async": false,
           "exportedName": "getPrivateMentorshipSettings",
           "filename": "mrp_frontend/app/actions/private-mentorship-settings.ts"
@@ -120,10 +120,10 @@
       "exportedName": "getPrivateMentorshipSettings",
       "filename": "mrp_frontend/app/actions/private-mentorship-settings.ts"
     },
-    "40c33a39641b406f4b71350bee91fa8ebadd07c3c5": {
+    "40dc8fc5f43cb8118d29a67b3b1a2662050a1ac8bd": {
       "workers": {
         "app/admin/(dashboard)/settings/page": {
-          "moduleId": 96555,
+          "moduleId": 92188,
           "async": false,
           "exportedName": "updatePrivateMentorshipSettings",
           "filename": "mrp_frontend/app/actions/private-mentorship-settings.ts"
@@ -135,10 +135,10 @@
       "exportedName": "updatePrivateMentorshipSettings",
       "filename": "mrp_frontend/app/actions/private-mentorship-settings.ts"
     },
-    "400e55075906b3a5955a42cd57c9977ef008297a5b": {
+    "40de37e53a82fabb87deb91be55c2bf8944735da0f": {
       "workers": {
         "app/admin/(dashboard)/settings/page": {
-          "moduleId": 96555,
+          "moduleId": 92188,
           "async": false,
           "exportedName": "updatePromoBannerSettings",
           "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
@@ -150,10 +150,10 @@
       "exportedName": "updatePromoBannerSettings",
       "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
     },
-    "00280d9ac302bc5ab0486c28954fede661899a6372": {
+    "00b825fde647db3cdb6ad2d0a17992af5875a79ab3": {
       "workers": {
         "app/admin/(dashboard)/settings/page": {
-          "moduleId": 96555,
+          "moduleId": 92188,
           "async": false,
           "exportedName": "getAccountManagementSettings",
           "filename": "mrp_frontend/app/actions/account-management-settings.ts"
@@ -165,10 +165,10 @@
       "exportedName": "getAccountManagementSettings",
       "filename": "mrp_frontend/app/actions/account-management-settings.ts"
     },
-    "40a71d819d6dcea6b594ab36af06b029ddb2e263d0": {
+    "409e2aa4f74421b977ddc2b0b46dcd1f02bb56ec87": {
       "workers": {
         "app/admin/(dashboard)/settings/page": {
-          "moduleId": 96555,
+          "moduleId": 92188,
           "async": false,
           "exportedName": "updateAccountManagementSettings",
           "filename": "mrp_frontend/app/actions/account-management-settings.ts"
@@ -180,10 +180,10 @@
       "exportedName": "updateAccountManagementSettings",
       "filename": "mrp_frontend/app/actions/account-management-settings.ts"
     },
-    "00c359d510ed5fa43654195302852e53f2644a65d5": {
+    "0095c7c4a6e42278de282a86974957884da176a8b0": {
       "workers": {
         "app/admin/(dashboard)/settings/page": {
-          "moduleId": 96555,
+          "moduleId": 92188,
           "async": false,
           "exportedName": "getYoutubeSettings",
           "filename": "mrp_frontend/app/actions/youtube-settings.ts"
@@ -195,10 +195,10 @@
       "exportedName": "getYoutubeSettings",
       "filename": "mrp_frontend/app/actions/youtube-settings.ts"
     },
-    "407b1e6566aa7f2a14db00176563b23635c634775a": {
+    "40601ca17b62f01bb08d9b7fbadc5fb488d96ad6eb": {
       "workers": {
         "app/admin/(dashboard)/settings/page": {
-          "moduleId": 96555,
+          "moduleId": 92188,
           "async": false,
           "exportedName": "updateYoutubeSettings",
           "filename": "mrp_frontend/app/actions/youtube-settings.ts"
@@ -209,6 +209,36 @@
       },
       "exportedName": "updateYoutubeSettings",
       "filename": "mrp_frontend/app/actions/youtube-settings.ts"
+    },
+    "0076bbf0f4dbc71f62c249454e1bd67c882cde9dba": {
+      "workers": {
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 92188,
+          "async": false,
+          "exportedName": "getPhysicalClassesSettings",
+          "filename": "mrp_frontend/app/actions/physical-classes-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/page": "action-browser"
+      },
+      "exportedName": "getPhysicalClassesSettings",
+      "filename": "mrp_frontend/app/actions/physical-classes-settings.ts"
+    },
+    "40094f04c3d586b690cf651319b6f0b870daf173a8": {
+      "workers": {
+        "app/admin/(dashboard)/settings/page": {
+          "moduleId": 92188,
+          "async": false,
+          "exportedName": "updatePhysicalClassesSettings",
+          "filename": "mrp_frontend/app/actions/physical-classes-settings.ts"
+        }
+      },
+      "layer": {
+        "app/admin/(dashboard)/settings/page": "action-browser"
+      },
+      "exportedName": "updatePhysicalClassesSettings",
+      "filename": "mrp_frontend/app/actions/physical-classes-settings.ts"
     }
   },
   "edge": {}

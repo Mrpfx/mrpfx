@@ -1,6 +1,6 @@
 {
   "node": {
-    "00913f5982e0644852ab617d1d68b1a085b6a6dc4d": {
+    "00c02af8655a4969fd67c5487d901d2f0583e05d3b": {
       "workers": {
         "app/private-mentorship/page": {
           "moduleId": 76887,
@@ -15,7 +15,7 @@
       "exportedName": "getPromoBannerSettings",
       "filename": "mrp_frontend/app/actions/promo-banner-settings.ts"
     },
-    "00e5d23d3137348d2ef7dc5fc82bf0f7a28f16d974": {
+    "00a87057ef23e459e7aa1b309979e80e0fa5b00fe4": {
       "workers": {
         "app/private-mentorship/page": {
           "moduleId": 76887,

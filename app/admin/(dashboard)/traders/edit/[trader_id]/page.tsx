@@ -30,19 +30,19 @@ export default function EditTraderPage() {
                 } else if (response && response.traders && Array.isArray(response.traders)) {
                     traders = response.traders;
                 }
-                
+
                 setDebugTraders(traders);
 
                 const safeId = traderId ? traderId.toLowerCase().trim() : '';
                 const decodedId = traderId ? decodeURIComponent(traderId).toLowerCase().trim() : '';
-                
+
                 const found = traders.find(t => {
                     if (!t) return false;
-                    const tid = String(t.trader_id || t.id || '').toLowerCase().trim();
+                    const tid = String(t.trader_id || '').toLowerCase().trim();
                     const encTid = encodeURIComponent(tid);
                     return tid === decodedId || tid === safeId || encTid === safeId || tid.replace(/\s+/g, '%20') === safeId;
                 });
-                
+
                 if (found) {
                     setTrader(found);
                 } else {
@@ -103,7 +103,7 @@ export default function EditTraderPage() {
                 <p className="text-xs text-red-400 mt-2">Fetched {debugTraders.length} traders.</p>
                 {debugTraders.length > 0 && (
                     <div className="mt-4 p-4 bg-gray-900 rounded-lg max-w-2xl mx-auto text-left overflow-auto max-h-48 text-xs font-mono text-gray-400">
-                        Available IDs: 
+                        Available IDs:
                         {debugTraders.map(t => `'${t.trader_id || t.id}'`).join(', ')}
                     </div>
                 )}

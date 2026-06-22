@@ -15,6 +15,6 @@ R.c("server/chunks/ssr/mrp_frontend_app_not-found_tsx_dcccb0f2._.js")
 R.c("server/chunks/ssr/62a22_next_dist_client_components_76120c13._.js")
 R.c("server/chunks/ssr/62a22_next_dist_client_components_builtin_unauthorized_4c705db7.js")
 R.c("server/chunks/ssr/mrp_frontend_app_admin_(dashboard)_layout_tsx_88d594bf._.js")
-R.c("server/chunks/ssr/[root-of-the-server]__938aac27._.js")
+R.c("server/chunks/ssr/[root-of-the-server]__c9bca8b4._.js")
 R.m(66485)
 module.exports=R.m(66485).exports
