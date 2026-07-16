@@ -1,3 +1,0 @@
-module.exports=[50749,16175,a=>{"use strict";var b=a.i(5050);let c=(0,b.createServerReference)("0092037f37a8a246652dc5a6b850201b63610f5c25",b.callServer,void 0,b.findSourceMapURL,"getPropFirmSettings");a.s(["getPropFirmSettings",()=>c],50749);let d=(0,b.createServerReference)("406060fb33155a4c3cc7dc07bcd9faa5bfba62cb8c",b.callServer,void 0,b.findSourceMapURL,"updatePropFirmSettings");a.s(["updatePropFirmSettings",()=>d],16175)},72328,a=>{"use strict";a.s([],72327),a.i(72327);var b=a.i(50749),c=a.i(16175);a.s(["getPropFirmSettings",()=>b.getPropFirmSettings,"updatePropFirmSettings",()=>c.updatePropFirmSettings],72328)}];
-
-//# sourceMappingURL=app_actions_bda492e7._.js.map
