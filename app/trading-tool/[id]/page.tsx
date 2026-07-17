@@ -210,7 +210,7 @@ export default function TradingToolPage() {
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    {tool.whop_payment_link && (
+                                    {false && tool.whop_payment_link && (
                                         <button
                                             onClick={() => withAuth(() => window.open(tool.whop_payment_link, '_blank'), { key: 'whop-checkout' })}
                                             className="flex items-center justify-center gap-2 py-3 bg-[#FC440F]/10 hover:bg-[#FC440F]/20 border border-[#FC440F]/20 text-[#FC440F] rounded-xl text-xs font-bold transition-all"

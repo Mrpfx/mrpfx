@@ -222,7 +222,7 @@ export function StepPayment({ data, updateData, onSubmit, onBack, loading, prici
                             </div>
                         </div>
                         <p className="text-xs text-slate-600 leading-relaxed mb-6 font-medium">
-                            Complete your payment through our verified external partner (Sellar / Whop). After payment, your credentials will be processed automatically.
+                            Complete your payment through our verified external partner (Sellar). After payment, your credentials will be processed automatically.
                         </p>
                     </div>
                 </div>
