@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getMentorshipSettings, updateMentorshipSettings } from '@/app/actions/mentorship-settings';
 import { getMentorship100Settings, updateMentorship100Settings } from '@/app/actions/mentorship-100-settings';
 import { getVIPSettings, updateVIPSettings, VIPSettings } from '@/app/actions/vip-settings';
@@ -9,7 +9,11 @@ import { getPromoBannerSettings, updatePromoBannerSettings } from '@/app/actions
 import { getAccountManagementSettings, updateAccountManagementSettings, AccountManagementSettings } from '@/app/actions/account-management-settings';
 import { getYoutubeSettings, updateYoutubeSettings } from '@/app/actions/youtube-settings';
 import { getPhysicalClassesSettings, updatePhysicalClassesSettings } from '@/app/actions/physical-classes-settings';
-import { Save, Youtube, MapPin } from 'lucide-react';
+import { Save, Youtube, MapPin, Download, Upload, ImagePlus } from 'lucide-react';
+import { MediaPickerModal } from '@/components/admin/MediaPickerModal';
+import type { WPMediaItem } from '@/lib/admin-api';
+import { getMediaUrl } from '@/lib/utils';
+import Image from 'next/image';
 
 export default function SettingsPage() {
     const [date, setDate] = useState('');
@@ -26,6 +30,9 @@ export default function SettingsPage() {
     const [heroTitle1, setHeroTitle1] = useState('');
     const [heroTitle2, setHeroTitle2] = useState('');
     const [heroSubtitle, setHeroSubtitle] = useState('');
+    const [heroImage, setHeroImage] = useState('');
+    const [heroVideoUrl, setHeroVideoUrl] = useState('');
+    const [showMediaModal, setShowMediaModal] = useState(false);
     const [courseDateText, setCourseDateText] = useState('');
     const [heroDescription, setHeroDescription] = useState('');
     const [pinnedNote, setPinnedNote] = useState('');
@@ -78,6 +85,9 @@ export default function SettingsPage() {
     const [savingYoutube, setSavingYoutube] = useState(false);
     const [youtubeMessage, setYoutubeMessage] = useState('');
 
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [importExportMessage, setImportExportMessage] = useState('');
+
     useEffect(() => {
         getMentorshipSettings().then(data => {
             if (data?.registrationOpenDate) {
@@ -108,6 +118,8 @@ export default function SettingsPage() {
             setHeroTitle1(data?.heroTitle1 || '');
             setHeroTitle2(data?.heroTitle2 || '');
             setHeroSubtitle(data?.heroSubtitle || '');
+            setHeroImage(data?.heroImage || '');
+            setHeroVideoUrl(data?.heroVideoUrl || '');
             setCourseDateText(data?.courseDateText || '');
             setHeroDescription(data?.heroDescription || '');
             setPinnedNote(data?.pinnedNote || '');
@@ -190,6 +202,8 @@ export default function SettingsPage() {
                 heroTitle1,
                 heroTitle2,
                 heroSubtitle,
+                heroImage,
+                heroVideoUrl,
                 courseDateText,
                 heroDescription,
                 pinnedNote,
@@ -306,6 +320,121 @@ export default function SettingsPage() {
             setYoutubeMessage('Failed to save settings.');
         }
         setSavingYoutube(false);
+    };
+
+    const collectAllSettings = () => ({
+        standardMentorship: { registrationOpenDate: date, productSlug },
+        mentorship100: {
+            registrationOpenDate: date100,
+            productSlug: productSlug100,
+            heroTitle1, heroTitle2, heroSubtitle, heroImage, heroVideoUrl,
+            courseDateText, heroDescription, pinnedNote,
+            primaryCtaText, secondaryCtaText, secondaryCtaLink,
+            limitedAdmissionTitle,
+            limitedAdmissionPoints: limitedAdmissionPointsText.split('\n').map(p => p.trim()).filter(Boolean),
+            whatYouWillLearnTitle,
+            whatYouWillLearnPoints: whatYouWillLearnPointsText.split('\n').map(p => p.trim()).filter(Boolean),
+            transformationText1, transformationText2,
+            detailsTitle, detailsDateRange,
+            detailsInclusions: detailsInclusionsText.split('\n').map(p => p.trim()).filter(Boolean),
+            bottomCtaText
+        },
+        vip: { vipSlugs, vipDate, vipGroupLink },
+        privateMentorship: { classASlug, classBSlug },
+        physicalClasses: { physClassASlug, physClassBSlug },
+        promobanner: { active: promoActive, text: promoText, link: promoLink, backgroundColor: promoColor },
+        accountManagement: { minCapital: accMgmtMinCapital, placeholder: accMgmtPlaceholder },
+        youtube: { apiKey: youtubeApiKey, channelId: youtubeChannelId }
+    });
+
+    const handleExportSettings = () => {
+        const data = collectAllSettings();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mrp-settings-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setImportExportMessage('Settings exported successfully!');
+        setTimeout(() => setImportExportMessage(''), 3000);
+    };
+
+    const handleImportSettings = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const data = JSON.parse(event.target?.result as string);
+                if (data.mentorship100) {
+                    const m = data.mentorship100;
+                    setDate100(m.registrationOpenDate || '');
+                    setProductSlug100(m.productSlug || 'mentorship-100');
+                    setHeroTitle1(m.heroTitle1 || '');
+                    setHeroTitle2(m.heroTitle2 || '');
+                    setHeroSubtitle(m.heroSubtitle || '');
+                    setHeroImage(m.heroImage || '');
+                    setHeroVideoUrl(m.heroVideoUrl || '');
+                    setCourseDateText(m.courseDateText || '');
+                    setHeroDescription(m.heroDescription || '');
+                    setPinnedNote(m.pinnedNote || '');
+                    setPrimaryCtaText(m.primaryCtaText || '');
+                    setSecondaryCtaText(m.secondaryCtaText || '');
+                    setSecondaryCtaLink(m.secondaryCtaLink || '');
+                    setLimitedAdmissionTitle(m.limitedAdmissionTitle || '');
+                    setLimitedAdmissionPointsText((m.limitedAdmissionPoints || []).join('\n'));
+                    setWhatYouWillLearnTitle(m.whatYouWillLearnTitle || '');
+                    setWhatYouWillLearnPointsText((m.whatYouWillLearnPoints || []).join('\n'));
+                    setTransformationText1(m.transformationText1 || '');
+                    setTransformationText2(m.transformationText2 || '');
+                    setDetailsTitle(m.detailsTitle || '');
+                    setDetailsDateRange(m.detailsDateRange || '');
+                    setDetailsInclusionsText((m.detailsInclusions || []).join('\n'));
+                    setBottomCtaText(m.bottomCtaText || '');
+                }
+                if (data.standardMentorship) {
+                    setDate(data.standardMentorship.registrationOpenDate || '');
+                    setProductSlug(data.standardMentorship.productSlug || 'standard-mentorship');
+                }
+                if (data.vip) {
+                    setVipSlugs(data.vip.vipSlugs || { oneMonth: '', twelveMonths: '', unlimited: '' });
+                    setVipDate(data.vip.vipDate || '');
+                    setVipGroupLink(data.vip.vipGroupLink || '');
+                }
+                if (data.privateMentorship) {
+                    setClassASlug(data.privateMentorship.classASlug || '');
+                    setClassBSlug(data.privateMentorship.classBSlug || '');
+                }
+                if (data.physicalClasses) {
+                    setPhysClassASlug(data.physicalClasses.physClassASlug || '');
+                    setPhysClassBSlug(data.physicalClasses.physClassBSlug || '');
+                }
+                if (data.promobanner) {
+                    setPromoActive(data.promobanner.active || false);
+                    setPromoText(data.promobanner.text || '');
+                    setPromoLink(data.promobanner.link || '');
+                    setPromoColor(data.promobanner.backgroundColor || 'bg-[#5B2EFF]');
+                }
+                if (data.accountManagement) {
+                    setAccMgmtMinCapital(data.accountManagement.minCapital || 500);
+                    setAccMgmtPlaceholder(data.accountManagement.placeholder || '');
+                }
+                if (data.youtube) {
+                    setYoutubeApiKey(data.youtube.apiKey || '');
+                    setYoutubeChannelId(data.youtube.channelId || '');
+                }
+                setImportExportMessage('Settings imported successfully! Save each section to persist changes.');
+                setTimeout(() => setImportExportMessage(''), 5000);
+            } catch {
+                setImportExportMessage('Invalid JSON file.');
+                setTimeout(() => setImportExportMessage(''), 3000);
+            }
+        };
+        reader.readAsText(file);
+        if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
     if (loading) return <div className="p-8 text-gray-400">Loading settings...</div>;
@@ -576,6 +705,50 @@ export default function SettingsPage() {
                                 value={heroSubtitle}
                                 onChange={(e) => setHeroSubtitle(e.target.value)}
                                 className="w-full p-2.5 bg-[#111827] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Hero Image</label>
+                            <div className="flex flex-col gap-3">
+                                {heroImage && (
+                                    <div className="relative w-40 h-28 rounded-lg overflow-hidden border border-gray-700 bg-[#111827]">
+                                        <Image
+                                            src={getMediaUrl(heroImage) || heroImage}
+                                            alt="Hero preview"
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
+                                )}
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowMediaModal(true)}
+                                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                                    >
+                                        <ImagePlus className="w-4 h-4" />
+                                        {heroImage ? 'Change Image' : 'Upload / Select Image'}
+                                    </button>
+                                    {heroImage && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setHeroImage('')}
+                                            className="px-3 py-2 text-sm text-red-400 hover:text-red-300 font-medium transition-colors"
+                                        >
+                                            Remove
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Hero Video URL (YouTube or other)</label>
+                            <input
+                                type="text"
+                                value={heroVideoUrl}
+                                onChange={(e) => setHeroVideoUrl(e.target.value)}
+                                placeholder="https://www.youtube.com/watch?v=..."
+                                className="w-full p-2.5 bg-[#111827] border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm"
                             />
                         </div>
                         <div>
@@ -993,6 +1166,55 @@ export default function SettingsPage() {
                     )}
                 </div>
             </div>
+
+            {/* Import / Export Settings */}
+            <div className="bg-[#1F2937] rounded-xl shadow-sm border border-gray-800 p-6 mb-6">
+                <h2 className="text-xl font-semibold mb-4 text-white flex items-center gap-2">
+                    <Download className="w-6 h-6 text-emerald-500" />
+                    Import / Export Settings
+                </h2>
+                <p className="text-sm text-gray-500 mb-6">
+                    Export all settings as JSON for backup, or import from a previous export. After importing, remember to save each section individually.
+                </p>
+                <div className="flex flex-wrap items-center gap-4">
+                    <button
+                        onClick={handleExportSettings}
+                        className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors"
+                    >
+                        <Download className="w-5 h-5" />
+                        Export All Settings
+                    </button>
+                    <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="flex items-center gap-2 px-6 py-2.5 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 transition-colors"
+                    >
+                        <Upload className="w-5 h-5" />
+                        Import Settings
+                    </button>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".json"
+                        onChange={handleImportSettings}
+                        className="hidden"
+                    />
+                    {importExportMessage && (
+                        <span className={`text-sm ${importExportMessage.includes('success') ? 'text-green-400' : 'text-red-400'}`}>
+                            {importExportMessage}
+                        </span>
+                    )}
+                </div>
+            </div>
+
+            <MediaPickerModal
+                isOpen={showMediaModal}
+                onClose={() => setShowMediaModal(false)}
+                onSelect={(media: WPMediaItem) => {
+                    setHeroImage(media.url || media.source_url || '');
+                    setShowMediaModal(false);
+                }}
+                title="Select Hero Image"
+            />
 
         </div>
     );

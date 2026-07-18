@@ -4,14 +4,15 @@
   "heroTitle1": "Live One-On-One",
   "heroTitle2": "Trading Mentorship",
   "heroSubtitle": "With Mr P",
-  "courseDateText": "March 2nd – 10th, 2026",
+  "courseDateText": "AUGUST 17TH – 26TH, 2026",
   "heroDescription": "During this program, Mr P will personally teach LIVE through Zoom, guiding you step-by-step through real market execution and advanced chart mastery.",
   "pinnedNote": "All classes will be recorded and sent to the private group after each session in case you miss any live class.",
   "primaryCtaText": "RESERVE YOUR SEAT NOW",
-  "secondaryCtaText": "JOIN NOW – LIMITED SPOTS!",
-  "secondaryCtaLink": "https://samdavweb.com",
+  "secondaryCtaText": "CHECK OUT – COURSE OUTLINE!",
+  "secondaryCtaLink": "https://drive.google.com/file/d/1oMy_DiGrQM1ibVVqLP_9HL-FMbUqhhqd/view?usp=drivesdk",
   "limitedAdmissionTitle": "Limited Admission",
   "limitedAdmissionPoints": [
+    "Mentorship Course 100 Season 9",
     "To maintain real interaction during the Zoom sessions, only 100 TRADERS will be accepted into this mentorship program.",
     "Once the seats are filled, registration will permanently close."
   ],
@@ -27,15 +28,17 @@
     "Funding opportunity up to $10,000",
     "Private LIVE trading with Mr P"
   ],
-  "transformationText1": "This Is Not a Normal Forex Class —",
-  "transformationText2": "This is a Trading Transformation",
-  "detailsTitle": "Registration Details",
-  "detailsDateRange": "March 2nd-10th",
+  "transformationText1": "Direct Intensive Mentorship  —",
+  "transformationText2": "Live Trading Sessions",
+  "detailsTitle": "Details/OTHER ACCESS",
+  "detailsDateRange": "AUGUST 17TH -26th",
   "detailsInclusions": [
-    "12 months VIP group",
-    "Access to VIP tools",
-    "Private live sessions",
-    "Recorded classes"
+    "FREE ACCESS to 12 Months VIP Group",
+    "FREE ACCESS to VIPTrading Robot.",
+    "FREE ACCESS to VIP Trading Indicator.",
+    "LIVE Trading Sessions With Mr P",
+    "Learn how to create your own trading bots",
+    "Lifetime access to all mentorship recordings."
   ],
   "bottomCtaText": "JOIN NOW – LIMITED!"
 }

@@ -7,7 +7,7 @@ import { productsService } from '@/lib/products';
 import { cartService } from '@/lib/cart';
 import { useCartAuth } from '@/hooks/useCartAuth';
 import { WCProductRead } from '@/lib/types';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 
 interface MentorshipCourse100ContentProps {
     settings: any;
@@ -15,11 +15,37 @@ interface MentorshipCourse100ContentProps {
 
 export default function MentorshipCourse100Content({ settings }: MentorshipCourse100ContentProps) {
     const productSlug = settings?.productSlug || 'mentorship-100';
+    const heroVideoUrl = settings?.heroVideoUrl || '';
     const router = useRouter();
     const [product, setProduct] = useState<WCProductRead | null>(null);
     const [loading, setLoading] = useState(true);
     const { isAuthenticated, savePendingAction, getPendingAction, clearPendingAction, redirectToLogin } = useCartAuth();
     const [addingToCart, setAddingToCart] = useState(false);
+    const [showVideoModal, setShowVideoModal] = useState(false);
+
+    const getYoutubeEmbedUrl = (url: string): string | null => {
+        const patterns = [
+            /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]+)/,
+            /(?:youtu\.be\/)([a-zA-Z0-9_-]+)/,
+            /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/
+        ];
+        for (const p of patterns) {
+            const match = url.match(p);
+            if (match) return `https://www.youtube.com/embed/${match[1]}?autoplay=1`;
+        }
+        return null;
+    };
+
+    const handleHeroClick = () => {
+        if (heroVideoUrl) {
+            const embedUrl = getYoutubeEmbedUrl(heroVideoUrl);
+            if (embedUrl) {
+                setShowVideoModal(true);
+            } else {
+                window.open(heroVideoUrl, '_blank');
+            }
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -88,6 +114,7 @@ export default function MentorshipCourse100Content({ settings }: MentorshipCours
     const heroTitle1 = settings?.heroTitle1 || 'Live One-On-One';
     const heroTitle2 = settings?.heroTitle2 || 'Trading Mentorship';
     const heroSubtitle = settings?.heroSubtitle || 'With Mr P';
+    const heroImage = settings?.heroImage || '/images/home/trading_mentor_preview.png';
     const courseDateText = settings?.courseDateText || 'March 2nd – 10th, 2026';
     const heroDescription = settings?.heroDescription || 'During this program, Mr P will personally teach <strong class="text-[#F8CD5C]">LIVE</strong> through Zoom, guiding you step-by-step through <strong class="text-white">real market execution</strong> and advanced chart mastery.';
     const pinnedNote = settings?.pinnedNote || 'All classes will be recorded and sent to the <strong class="text-white underline decoration-[#D4AF37]/50">private group</strong> after each session in case you miss any live class.';
@@ -184,11 +211,14 @@ export default function MentorshipCourse100Content({ settings }: MentorshipCours
 
                 {/* 3. Hero Video/Image */}
                 <div className="col-span-1 lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:row-span-3 relative w-full lg:-mt-[-90px]">
-                    <div className="relative aspect-[4/5] sm:aspect-[4/3] w-full group cursor-pointer overflow-hidden rounded-lg sm:rounded-none">
+                    <div
+                        onClick={handleHeroClick}
+                        className="relative aspect-[4/5] sm:aspect-[4/3] w-full group cursor-pointer overflow-hidden rounded-lg sm:rounded-none"
+                    >
                         <div className="absolute inset-0 rounded-lg sm:rounded-none shadow-[inset_0_0_40px_rgba(0,0,0,0.8)] z-10 pointer-events-none"></div>
 
                         <Image
-                            src="/images/home/trading_mentor_preview.png"
+                            src={heroImage}
                             alt="Mentorship Video Preview"
                             fill
                             className="object-cover transition-transform duration-700 group-hover:scale-110 mix-blend-lighten opacity-95"
@@ -390,6 +420,32 @@ export default function MentorshipCourse100Content({ settings }: MentorshipCours
                     </button>
                 </div>
             </div>
+
+            {/* Video Modal */}
+            {showVideoModal && heroVideoUrl && (
+                <div
+                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 sm:p-8"
+                    onClick={() => setShowVideoModal(false)}
+                >
+                    <div
+                        className="relative w-full max-w-4xl aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            onClick={() => setShowVideoModal(false)}
+                            className="absolute -top-10 right-0 z-30 text-white/80 hover:text-white transition-colors p-1"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+                        <iframe
+                            src={getYoutubeEmbedUrl(heroVideoUrl)!}
+                            className="w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

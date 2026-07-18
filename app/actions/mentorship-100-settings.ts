@@ -9,6 +9,8 @@ const SETTINGS_FILE = path.join(process.cwd(), 'mentorship-100-settings.json');
 const DEFAULT_MENTORSHIP_100_SETTINGS = {
     registrationOpenDate: null as string | null,
     productSlug: 'mentorship-100',
+    heroImage: '/images/home/trading_mentor_preview.png',
+    heroVideoUrl: '',
     heroTitle1: 'Live One-On-One',
     heroTitle2: 'Trading Mentorship',
     heroSubtitle: 'With Mr P',
