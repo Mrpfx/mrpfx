@@ -392,7 +392,7 @@ export default function GlobalCheckoutModal() {
                                     )}
                                     <p className="text-[10px] text-amber-400/60 mt-2 flex items-center gap-1 px-1">
                                         <Info className="w-2.5 h-2.5 shrink-0" />
-                                        <span>Discount only applies to crypto payments</span>
+                                        <span>crypto coupon applies immediately here. For card, apply coupon after proceeding to payment page</span>
                                     </p>
                                 </div>
                             </div>
